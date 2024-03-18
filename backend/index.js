@@ -5,9 +5,15 @@ const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const multer = require("multer");
 const path = require("path");
+const cors = require("cors");
 
-
-
+app.use(
+    cors({
+      origin: "*",
+      credentials: true,
+      methods: "GET,POST",
+    })
+  );
 // Add the following middleware to enable CORS
 app.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
