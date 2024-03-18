@@ -1,4 +1,4 @@
-const port = process.env.PORT || 4000;
+const port = 4000;
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
@@ -7,11 +7,54 @@ const multer = require("multer");
 const path = require("path");
 const cors = require("cors");
 
-// Middleware to enable CORS
-app.use(cors());
+// Define the allowed origins
+const allowedOrigins = [
+    'https://aadil-tansawala-e-commerce-college-frontend.vercel.app/*',
+    'https://aadil-tansawala-e-commerce-college-admin.vercel.app/*',
+];
 
-// Middleware to parse JSON bodies
+// Configure CORS with allowed origins
+const corsOptions = {
+    origin: function (origin, callback) {
+        // Check if the request origin is in the allowed list
+        if (allowedOrigins.includes(origin)) {
+            callback(null, true); // Allow the request
+        } else {
+            callback(new Error('Not allowed by CORS')); // Deny the request
+        }
+    },
+    // Other CORS options can be added here if needed
+};
+
+// Enable CORS with the configured options
+app.use(cors(corsOptions));
+
+
+// Add the following middleware to enable CORS
+app.use((req, res, next) => {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader(
+        "Access-Control-Allow-Headers",
+        "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+    );
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS"); // Include OPTIONS method
+    next();
+});
+
+// Handle preflight requests
+app.options("*", (req, res) => {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader(
+        "Access-Control-Allow-Headers",
+        "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+    );
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
+    res.sendStatus(200);
+});
+
+
 app.use(express.json());
+
 
 // Database Connection with MongoDB
 mongoose.connect("mongodb+srv://aadil:07070707@cluster0.x4wrsel.mongodb.net/E-COMMERCE");
@@ -28,14 +71,14 @@ const storage = multer.diskStorage({
     filename: (req, file, cb) => {
       cb(null, `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`);
     }
-});
+  });
   
-const upload = multer({ storage: storage });
+  const upload = multer({ storage: storage });
+  
 
 // Creating Upload Endpoints for images
 // Serve static files (images) from the 'upload/images' directory
-app.use('/images', express.static(path.join(__dirname, 'upload/images')));
-
+app.use('/images', express.static('upload/images'));
 
 // Route for handling file uploads
 app.post("/upload", upload.single('product'), (req, res) => {
