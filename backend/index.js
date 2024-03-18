@@ -7,11 +7,13 @@ const multer = require("multer");
 const path = require("path");
 const cors = require("cors");
 // Add the following middleware to enable CORS
+// Enable CORS with specific options
 app.use(cors({
-    origin: "*",
-    credentials: true,
-    methods: "GET,POST",
-  }));
+    origin: "https://aadil-tansawala-e-commerce-college-admin.vercel.app", // Allow requests from this origin
+    methods: "GET,POST,PUT,DELETE", // Allow specific HTTP methods
+    credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+}));
+
   
   // Add middleware to parse JSON bodies
   app.use(express.json());
