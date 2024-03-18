@@ -31,6 +31,7 @@ const ListProduct = () => {
     const remove_product = async (id) => {
         try {
             await fetch(`${SERVER}/removeproduct`, {
+                mode: 'no-cors',
                 method: 'POST',
                 headers: {
                     Accept: 'application/json',
