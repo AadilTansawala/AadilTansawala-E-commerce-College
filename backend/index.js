@@ -42,15 +42,8 @@ const upload = multer({ storage: storage });
 
 // Creating Upload Endpoints for images
 // Serve static files (images) from the 'upload/images' directory
-app.use('/images', express.static('upload/images'));
+app.use('/images', express.static(path.join(__dirname, 'upload/images')));
 
-// Route for handling file uploads
-const storage = multer.diskStorage({
-    destination: './upload/images', // Change the destination directory to a regular directory
-    filename: (req, file, cb) => {
-        cb(null, `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`);
-    }
-});
 
 // Schema for Creating Products
 const productSchema = new mongoose.Schema({
