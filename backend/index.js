@@ -65,13 +65,13 @@ app.get("/", (req, res) => {
 });
 
 // Image Storage Engine
-// Configure Multer to use the /tmp directory for storing uploads
+// Configure Multer to use the system's temp directory for storing uploads
 const storage = multer.diskStorage({
-    destination: '/tmp', // Use /tmp directory for temporary storage
+    destination: path.join(os.tmpdir(), 'uploads'), // Use the system's temp directory
     filename: (req, file, cb) => {
-      cb(null, `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`);
+        cb(null, `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`);
     }
-  });
+});
   
   const upload = multer({ storage: storage });
   
