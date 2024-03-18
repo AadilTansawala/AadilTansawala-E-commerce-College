@@ -10,14 +10,6 @@ const cors = require("cors");
 // Enable CORS with specific options
 app.use(cors());
 
-  // Handle preflight requests for all routes
-  app.options("*", (req, res) => {
-      res.setHeader("Access-Control-Allow-Origin", "*");
-      res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
-      res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
-      res.sendStatus(200);
-  });
-
 app.use(express.json());
 
 
