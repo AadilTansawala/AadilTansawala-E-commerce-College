@@ -1,33 +1,32 @@
-const port = 4000;
 const express = require("express");
-const app = express();
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const multer = require("multer");
 const path = require("path");
 
+const app = express();
+const port = process.env.PORT || 4000; // Use the environment port or default to 4000
 
 // Add the following middleware to enable CORS
 app.use((req, res, next) => {
+    // Set the CORS headers to allow requests from any origin
     res.setHeader("Access-Control-Allow-Origin", "*");
+    // Set the allowed headers
     res.setHeader(
         "Access-Control-Allow-Headers",
         "Origin, X-Requested-With, Content-Type, Accept, Authorization"
     );
+    // Set the allowed HTTP methods
     res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE");
     next();
 });
 
-
 app.use(express.json());
 
-
 // Database Connection with MongoDB
-mongoose.connect("mongodb+srv://aadil:07070707@cluster0.x4wrsel.mongodb.net/E-COMMERCE");
-
-// API Creation
-app.get("/", (req, res) => {
-    res.send("Express app is Running ");
+mongoose.connect("mongodb+srv://aadil:07070707@cluster0.x4wrsel.mongodb.net/E-COMMERCE", {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
 });
 
 // Image Storage Engine
@@ -35,12 +34,11 @@ app.get("/", (req, res) => {
 const storage = multer.diskStorage({
     destination: '/tmp', // Use /tmp directory for temporary storage
     filename: (req, file, cb) => {
-      cb(null, `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`);
+        cb(null, `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`);
     }
-  });
-  
-  const upload = multer({ storage: storage });
-  
+});
+
+const upload = multer({ storage: storage });
 
 // Creating Upload Endpoints for images
 // Serve static files (images) from the 'upload/images' directory
@@ -51,7 +49,7 @@ app.post("/upload", upload.single('product'), (req, res) => {
     // If file upload is successful, return a JSON response with success status and image URL
     res.json({
         success: 1,
-        imageUrl: `http://${req.hostname}:${port}/images/${req.file.filename}`
+        imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
     });
 });
 
