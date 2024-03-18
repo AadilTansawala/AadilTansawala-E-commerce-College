@@ -89,94 +89,66 @@ const productSchema = new mongoose.Schema({
 const Product = mongoose.model("Product", productSchema);
 
 
-app.post('/addproduct', async (req, res) => {
+// Add a new product
+app.post("/addproduct", async (req, res) => {
     try {
-        // Fetch all products from the database
-        let products = await Product.find({});
-
-        // Initialize a variable to hold the new ID
-        let id;
-
-        // Check if there are existing products
-        if (products.length > 0) {
-            // Get the last product from the array
-            let lastProduct = products[products.length - 1];
-
-            // Increment the last product's ID by one to generate a new ID
-            id = lastProduct.id + 1;
-        } else {
-            // If there are no existing products, start with ID 1
-            id = 1;
-        }
-
-        // Create a new product instance using the Product model
-        const product = new Product({
-            id: id,
-            name: req.body.name,
-            image: req.body.image,
-            category: req.body.category,
-            new_price: req.body.new_price,
-            old_price: req.body.old_price,
-        });
-
-        console.log(product);
-        // Save the product to the database
-        await product.save();
-        console.log("Saved");
-
-        res.status(201).json({
-            success: true,
-            message: "Product added successfully",
-            name: req.body.name,
-        });
-
+      // Fetch all products from the database
+      const products = await Product.find({});
+      // Initialize a new ID for the product
+      let id = products.length > 0 ? products[products.length - 1].id + 1 : 1;
+  
+      // Create a new product instance using the Product model
+      const product = new Product({
+        id: id,
+        name: req.body.name,
+        image: req.body.image,
+        category: req.body.category,
+        new_price: req.body.new_price,
+        old_price: req.body.old_price,
+      });
+  
+      // Save the product to the database
+      await product.save();
+  
+      // Send a success response
+      res.status(201).json({ success: true, message: "Product added successfully" });
     } catch (error) {
-        // If an error occurs, handle it and send an error response
-        console.error("Error adding product:", error);
-        res.status(500).json({ success: false, error: "An error occurred while adding the product" });
+      // If an error occurs, handle it and send an error response
+      console.error("Error adding product:", error);
+      res.status(500).json({ success: false, error: "An error occurred while adding the product" });
     }
-});
-
-//Creating API for deleting Products
-
-app.post('/removeproduct', async (req, res) => {
+  });
+  
+  // Remove a product
+  app.post("/removeproduct", async (req, res) => {
     try {
-        // Find and delete the product with the specified ID
-        await Product.findOneAndDelete({ id: req.body.id });
-
-        // Log a message to indicate that the product has been removed
-        console.log("Product Removed");
-
-        // Send a success response with the name of the deleted product
-        res.json({
-            success: true,
-            name: req.body.name
-        });
+      // Find and delete the product with the specified ID
+      const { id } = req.body;
+      await Product.findOneAndDelete({ _id: id });
+  
+      // Send a success response
+      res.json({ success: true, message: "Product removed successfully" });
     } catch (error) {
-        // If an error occurs, handle it and send an error response
-        console.error("Error removing product:", error);
-        res.status(500).json({ success: false, error: "An error occurred while removing the product" });
+      // If an error occurs, handle it and send an error response
+      console.error("Error removing product:", error);
+      res.status(500).json({ success: false, error: "An error occurred while removing the product" });
     }
-});
-
-// Creating API for getting all products
-
-app.get('/allproducts', async (req, res) => {
+  });
+  
+  // Get all products
+  app.get("/allproducts", async (req, res) => {
     try {
-        // Fetch all products from the database
-        let products = await Product.find({});
-
-        // Log a message to indicate that all products have been fetched
-        console.log("All Products Fetched");
-
-        // Send the fetched products as a response
-        res.json(products);
+      // Fetch all products from the database
+      const products = await Product.find({});
+  
+      // Send the fetched products as a response
+      res.json(products);
     } catch (error) {
-        // If an error occurs, handle it and send an error response
-        console.error("Error fetching products:", error);
-        res.status(500).json({ success: false, error: "An error occurred while fetching products" });
+      // If an error occurs, handle it and send an error response
+      console.error("Error fetching products:", error);
+      res.status(500).json({ success: false, error: "An error occurred while fetching products" });
     }
-});
+  });
 
 
 // Schema Creation for User Model
