@@ -11,19 +11,18 @@ const port = process.env.PORT || 4000; // Use the environment port or default to
 // Use CORS middleware to allow requests from any origin
 app.use(cors());
 
-// Add the following middleware to enable CORS
-app.use((req, res, next) => {
-    // Set the CORS headers to allow requests from your client application's origin
-    res.setHeader("Access-Control-Allow-Origin", "https://aadil-tansawala-e-commerce-college-admin.vercel.app");
-    // Set the allowed headers
-    res.setHeader(
-        "Access-Control-Allow-Headers",
-        "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-    );
-    // Set the allowed HTTP methods
-    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE");
-    next();
+// Middleware to handle preflight requests
+app.options('*', (req, res) => {
+    // Set CORS headers
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.setHeader('Access-Control-Max-Age', '3600'); // 1 hour
+
+    // Respond with a 200 status for preflight requests
+    res.sendStatus(200);
 });
+
+
 
 app.use(express.json());
 
