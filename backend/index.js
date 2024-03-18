@@ -15,17 +15,6 @@ app.use(cors());
 app.options('*', cors());
 
 
-// Middleware to handle preflight requests
-app.options('*', (req, res) => {
-    // Set CORS headers
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    res.setHeader('Access-Control-Max-Age', '3600'); // 1 hour
-
-    // Respond with a 200 status for preflight requests
-    res.sendStatus(200);
-});
-
 
 
 app.use(express.json());
