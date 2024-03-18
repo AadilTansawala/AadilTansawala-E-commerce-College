@@ -133,33 +133,21 @@ app.post('/addproduct', async (req, res) => {
         res.status(500).json({ success: false, error: "An error occurred while adding the product" });
     }
 });
-// Creating API for deleting Products
+
+//Creating API for deleting Products
+
 app.post('/removeproduct', async (req, res) => {
     try {
-        // Ensure the request body contains the product ID
-        const productId = req.body.id;
-        if (!productId) {
-            return res.status(400).json({ success: false, error: "Product ID is required" });
-        }
-
-        // Find the product by its MongoDB ObjectID and delete it
-        const deletedProduct = await Product.findByIdAndDelete(productId);
-
-        if (!deletedProduct) {
-            return res.status(404).json({ success: false, error: "Product not found" });
-        }
+        // Find and delete the product with the specified ID
+        await Product.findOneAndDelete({ id: req.body.id });
 
         // Log a message to indicate that the product has been removed
-        console.log("Product Removed:", deletedProduct.name);
+        console.log("Product Removed");
 
-        // Send a success response with the deleted product's details
+        // Send a success response with the name of the deleted product
         res.json({
             success: true,
-            message: "Product removed successfully",
-            deletedProduct: {
-                id: deletedProduct._id,
-                name: deletedProduct.name
-            }
+            name: req.body.name
         });
     } catch (error) {
         // If an error occurs, handle it and send an error response
