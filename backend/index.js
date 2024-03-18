@@ -9,8 +9,8 @@ const port = process.env.PORT || 4000; // Use the environment port or default to
 
 // Add the following middleware to enable CORS
 app.use((req, res, next) => {
-    // Set the CORS headers to allow requests from any origin
-    res.setHeader("Access-Control-Allow-Origin", "*");
+    // Set the CORS headers to allow requests from your client application's origin
+    res.setHeader("Access-Control-Allow-Origin", "https://aadil-tansawala-e-commerce-college-admin.vercel.app");
     // Set the allowed headers
     res.setHeader(
         "Access-Control-Allow-Headers",
