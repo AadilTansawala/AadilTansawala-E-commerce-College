@@ -6,12 +6,12 @@ const jwt = require("jsonwebtoken");
 const multer = require("multer");
 const path = require("path");
 const cors = require("cors");
-// Add the following middleware to enable CORS
-// Enable CORS with specific options
+
+// Middleware to enable CORS
 app.use(cors());
 
+// Middleware to parse JSON bodies
 app.use(express.json());
-
 
 // Database Connection with MongoDB
 mongoose.connect("mongodb+srv://aadil:07070707@cluster0.x4wrsel.mongodb.net/E-COMMERCE");
@@ -28,14 +28,14 @@ const storage = multer.diskStorage({
     filename: (req, file, cb) => {
       cb(null, `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`);
     }
-  });
+});
   
-  const upload = multer({ storage: storage });
-  
+const upload = multer({ storage: storage });
 
 // Creating Upload Endpoints for images
 // Serve static files (images) from the 'upload/images' directory
-app.use('/images', express.static('upload/images'));
+app.use('/images', express.static(path.join(__dirname, 'upload/images')));
+
 
 // Route for handling file uploads
 app.post("/upload", upload.single('product'), (req, res) => {
