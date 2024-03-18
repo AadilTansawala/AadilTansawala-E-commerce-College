@@ -10,12 +10,19 @@ const ListProduct = () => {
     const [allproducts, setAllProducts] = useState([]);
 
     const fetchInfo = async () => {
-        await fetch(`${SERVER}/allproducts`)
-            .then((res) => res.json())
-            .then((data) => {
-                setAllProducts(data);
-            });
+        try {
+            const response = await fetch(`${SERVER}/allproducts`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch products');
+            }
+            const data = await response.json();
+            setAllProducts(data);
+        } catch (error) {
+            console.error('Error fetching products:', error);
+            // Handle the error (e.g., show a message to the user)
+        }
     };
+    
 
     useEffect(() => {
         fetchInfo();
