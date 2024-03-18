@@ -6,12 +6,25 @@ const jwt = require("jsonwebtoken");
 const multer = require("multer");
 const path = require("path");
 const cors = require("cors");
-
-
 // Add the following middleware to enable CORS
+// Enable CORS with specific options
+app.use(cors({
+    origin: "*", // Allow requests from this origin
+    methods: "GET,POST,PUT,DELETE", // Allow specific HTTP methods
+    credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+}));
 
-app.use(cors());
-
+  
+  // Add middleware to parse JSON bodies
+  app.use(express.json());
+  
+  // Handle preflight requests for all routes
+  app.options("*", (req, res) => {
+      res.setHeader("Access-Control-Allow-Origin", "*");
+      res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+      res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
+      res.sendStatus(200);
+  });
 
 app.use(express.json());
 
@@ -27,11 +40,11 @@ app.get("/", (req, res) => {
 // Image Storage Engine
 // Configure Multer to use the /tmp directory for storing uploads
 const storage = multer.diskStorage({
-    destination: './upload/images', // Change the destination directory to a regular directory
+    destination: '/tmp', // Use /tmp directory for temporary storage
     filename: (req, file, cb) => {
-        cb(null, `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`);
+      cb(null, `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`);
     }
-});
+  });
   
   const upload = multer({ storage: storage });
   
