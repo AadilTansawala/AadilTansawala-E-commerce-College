@@ -9,8 +9,8 @@ const cors = require("cors");
 
 // Define the allowed origins
 const allowedOrigins = [
-    'https://aadil-tansawala-e-commerce-college-frontend.vercel.app/',
-    'https://aadil-tansawala-e-commerce-college-admin.vercel.app/',
+    'https://aadil-tansawala-e-commerce-college-frontend.vercel.app/*',
+    'https://aadil-tansawala-e-commerce-college-admin.vercel.app/*',
 ];
 
 // Configure CORS with allowed origins
