@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect } from "react";
-
+import { SERVER } from "../config";
 
 export const ShopContext = createContext(null);
 
@@ -20,7 +20,7 @@ const ShopContextProvider = (props) => {
     // Fetch all products and cart data when the component mounts
     useEffect(() => {
         // Fetch all products from the server
-        fetch('http://localhost:4000/allproducts')
+        fetch(`${SERVER}allproducts`)
             .then((response) => response.json())
             .then((data) => {
                 // Update state with fetched products
@@ -29,7 +29,7 @@ const ShopContextProvider = (props) => {
                 // Check if auth-token exists in localStorage
                 if (localStorage.getItem('auth-token')) {
                     // Construct the request to get cart data
-                    fetch('http://localhost:4000/getcart', {
+                    fetch(`${SERVER}getcart`, {
                         method: 'POST',
                         headers: {
                             Accept: 'application/form-data',
@@ -62,7 +62,7 @@ const ShopContextProvider = (props) => {
         // Check if auth-token exists in localStorage
         if (localStorage.getItem('auth-token')) {
             // Construct the request to add item to cart
-            fetch('http://localhost:4000/addtocart', {
+            fetch(`${SERVER}addtocart`, {
                 method: 'POST',
                 headers: {
                     Accept: 'application/form-data',
@@ -88,7 +88,7 @@ const ShopContextProvider = (props) => {
          // Check if auth-token exists in localStorage
          if (localStorage.getItem('auth-token')) {
             // Construct the request to add item to cart
-            fetch('http://localhost:4000/removefromcart', {
+            fetch(`${SERVER}removefromcart`, {
                 method: 'POST',
                 headers: {
                     Accept: 'application/form-data',

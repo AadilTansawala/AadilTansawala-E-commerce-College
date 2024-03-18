@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import './Popular.css'
 import Item from '../Item/Item'
+import { SERVER } from '../../config'
+
 
 const Popular = () => {
 
@@ -9,7 +11,7 @@ const Popular = () => {
      // Fetch popular women products when the component mounts
      useEffect(() => {
         // Fetch popular women products from the server
-        fetch('http://localhost:4000/popularinwomen')
+        fetch(`${SERVER}popularinwomen`)
             .then((response) => response.json())
             .then((data) => {
                 // Update state with fetched products

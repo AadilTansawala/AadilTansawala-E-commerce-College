@@ -1,7 +1,7 @@
 import React, { useState , useEffect} from 'react'
 import './NewCollections.css'
 import Item from '../Item/Item'
-
+import { SERVER } from '../../config'
 const NewCollections = () => {
 
 
@@ -10,7 +10,7 @@ const NewCollections = () => {
      // Fetch new products when the component mounts
      useEffect(() => {
         // Fetch new products from the server
-        fetch('http://localhost:4000/newcollections')
+        fetch(`${SERVER}newcollections`)
             .then((response) => response.json())
             .then((data) => {
                 // Update state with fetched products
