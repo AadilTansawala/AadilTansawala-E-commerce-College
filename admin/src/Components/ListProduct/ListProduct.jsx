@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import "./ListProduct.css"
 import cross_Icon from "../../Assets/cross_icon.png"
-import { SERVER } from '../../config';
+import SERVER from "../../config";
 
 
 const ListProduct = () => {
