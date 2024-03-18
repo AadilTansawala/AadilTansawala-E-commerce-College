@@ -1,4 +1,4 @@
-const port = 4000;
+const port = process.env.PORT || 4000;
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
@@ -7,50 +7,10 @@ const multer = require("multer");
 const path = require("path");
 const cors = require("cors");
 
-// Define the allowed origins
-const allowedOrigins = [
-    'https://aadil-tansawala-e-commerce-college-frontend.vercel.app/*',
-    'https://aadil-tansawala-e-commerce-college-admin.vercel.app/*',
-];
-
-// Configure CORS with allowed origins
-const corsOptions = {
-    origin: function (origin, callback) {
-        // Check if the request origin is in the allowed list
-        if (allowedOrigins.includes(origin)) {
-            callback(null, true); // Allow the request
-        } else {
-            callback(new Error('Not allowed by CORS')); // Deny the request
-        }
-    },
-    // Other CORS options can be added here if needed
-};
-
-// Enable CORS with the configured options
-app.use(cors(corsOptions));
-
 
 // Add the following middleware to enable CORS
-app.use((req, res, next) => {
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader(
-        "Access-Control-Allow-Headers",
-        "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-    );
-    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS"); // Include OPTIONS method
-    next();
-});
 
-// Handle preflight requests
-app.options("*", (req, res) => {
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader(
-        "Access-Control-Allow-Headers",
-        "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-    );
-    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
-    res.sendStatus(200);
-});
+app.use(cors());
 
 
 app.use(express.json());
@@ -65,9 +25,9 @@ app.get("/", (req, res) => {
 });
 
 // Image Storage Engine
-// Configure Multer to use the system's temp directory for storing uploads
+// Configure Multer to use the /tmp directory for storing uploads
 const storage = multer.diskStorage({
-    destination: path.join(os.tmpdir(), 'uploads'), // Use the system's temp directory
+    destination: './upload/images', // Change the destination directory to a regular directory
     filename: (req, file, cb) => {
         cb(null, `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`);
     }
