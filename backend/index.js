@@ -11,6 +11,10 @@ const port = process.env.PORT || 4000; // Use the environment port or default to
 // Use CORS middleware to allow requests from any origin
 app.use(cors());
 
+// Handle preflight requests for all routes
+app.options('*', cors());
+
+
 // Middleware to handle preflight requests
 app.options('*', (req, res) => {
     // Set CORS headers
