@@ -45,12 +45,11 @@ const upload = multer({ storage: storage });
 app.use('/images', express.static('upload/images'));
 
 // Route for handling file uploads
-app.post("/upload", upload.single('product'), (req, res) => {
-    // If file upload is successful, return a JSON response with success status and image URL
-    res.json({
-        success: 1,
-        imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
-    });
+const storage = multer.diskStorage({
+    destination: './upload/images', // Change the destination directory to a regular directory
+    filename: (req, file, cb) => {
+        cb(null, `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`);
+    }
 });
 
 // Schema for Creating Products
