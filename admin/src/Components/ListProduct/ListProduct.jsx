@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import "./ListProduct.css"
 import cross_Icon from "../../Assets/cross_icon.png"
-import axios from 'axios';
+
 
 
 const ListProduct = () => {
 
-    const SERVER = "https://aadil-tansawala-e-commerce-college-api.vercel.app";
+    const SERVER = "https://aadil-tansawala-e-commerce-college-api.vercel.app/";
     const [allproducts, setAllProducts] = useState([]);
 
     const fetchInfo = async () => {
@@ -30,11 +30,13 @@ const ListProduct = () => {
 
     const remove_product = async (id) => {
         try {
-            await axios.post(`${SERVER}removeproduct`, { id }, {
+            await fetch(`${SERVER}removeproduct`, {
+                method: 'POST',
                 headers: {
                     Accept: 'application/json',
                     'Content-Type': 'application/json',
                 },
+                body: JSON.stringify({ id: id }),
             });
             await fetchInfo();
         } catch (error) {
