@@ -7,9 +7,27 @@ const multer = require("multer");
 const path = require("path");
 const cors = require("cors");
 
-// Enable CORS
-app.use(cors());
+// Define the allowed origins
+const allowedOrigins = [
+    'https://aadil-tansawala-e-commerce-college-frontend.vercel.app/',
+    'https://aadil-tansawala-e-commerce-college-admin.vercel.app/',
+];
 
+// Configure CORS with allowed origins
+const corsOptions = {
+    origin: function (origin, callback) {
+        // Check if the request origin is in the allowed list
+        if (allowedOrigins.includes(origin)) {
+            callback(null, true); // Allow the request
+        } else {
+            callback(new Error('Not allowed by CORS')); // Deny the request
+        }
+    },
+    // Other CORS options can be added here if needed
+};
+
+// Enable CORS with the configured options
+app.use(cors(corsOptions));
 
 
 // Add the following middleware to enable CORS
