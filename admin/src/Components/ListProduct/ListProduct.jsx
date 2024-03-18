@@ -30,7 +30,7 @@ const ListProduct = () => {
 
     const remove_product = async (id) => {
         try {
-            await fetch(`${SERVER}/removeproduct`, {
+            await fetch(`${SERVER}removeproduct`, {
                 mode: 'no-cors',
                 method: 'POST',
                 headers: {
