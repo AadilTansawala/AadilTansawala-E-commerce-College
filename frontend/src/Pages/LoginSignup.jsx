@@ -2,8 +2,10 @@ import React from 'react'
 import './CSS/LoginSignup.css'
 import { useState } from 'react';
 
+
 const LoginSignup = () => {
 
+  const SERVER = "https://aadil-tansawala-e-commerce-college-api.vercel.app/";
   const [state, setState] = useState("Log in");
   const [formData, setFormData] = useState({
     username: "",
@@ -24,7 +26,7 @@ const LoginSignup = () => {
       let responseData;
 
       // Make a POST request to the signup endpoint
-      await fetch('http://localhost:4000/login', {
+      await fetch(`${SERVER}login`, {
         method: 'POST',
         headers: {
           Accept: 'application/form-data',
@@ -70,7 +72,7 @@ const LoginSignup = () => {
       let responseData;
 
       // Make a POST request to the signup endpoint
-      await fetch('http://localhost:4000/signup', {
+      await fetch(`${SERVER}signup`, {
         method: 'POST',
         headers: {
           Accept: 'application/form-data',

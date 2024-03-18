@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import './Popular.css'
 import Item from '../Item/Item'
-import { SERVER } from '../../config'
 
 
 const Popular = () => {
 
+    const SERVER = "https://aadil-tansawala-e-commerce-college-api.vercel.app/";
     const [popular_products , setPopular_products] = useState([]);
 
      // Fetch popular women products when the component mounts

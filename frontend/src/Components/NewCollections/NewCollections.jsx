@@ -1,10 +1,9 @@
 import React, { useState , useEffect} from 'react'
 import './NewCollections.css'
 import Item from '../Item/Item'
-import { SERVER } from '../../config'
 const NewCollections = () => {
 
-
+    const SERVER = "https://aadil-tansawala-e-commerce-college-api.vercel.app/";
     const [new_collection , setNew_collection] = useState([]);
 
      // Fetch new products when the component mounts
