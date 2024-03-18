@@ -15,9 +15,6 @@ app.use(cors({
 }));
 
   
-  // Add middleware to parse JSON bodies
-  app.use(express.json());
-  
   // Handle preflight requests for all routes
   app.options("*", (req, res) => {
       res.setHeader("Access-Control-Allow-Origin", "*");
