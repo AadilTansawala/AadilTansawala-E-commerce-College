@@ -8,20 +8,8 @@ const path = require("path");
 const cors = require("cors");
 // Add the following middleware to enable CORS
 // Enable CORS with specific options
-app.use(cors({
-    origin: "https://aadil-tansawala-e-commerce-college-admin.vercel.app", // Allow requests from this origin
-    methods: "GET,POST,PUT,DELETE", // Allow specific HTTP methods
-    credentials: true, // Allow credentials (cookies, authorization headers, etc.)
-}));
+app.use(cors());
 
-  
-  // Handle preflight requests for all routes
-  app.options("*", (req, res) => {
-      res.setHeader("Access-Control-Allow-Origin", "*");
-      res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
-      res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
-      res.sendStatus(200);
-  });
 
 app.use(express.json());
 
