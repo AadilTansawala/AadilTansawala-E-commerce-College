@@ -1,7 +1,7 @@
 import { useState } from "react";
 import "./AddProduct.css";
 import upload_area from "../../Assets/upload_area.svg";
-import { SERVER } from '../../config';
+import SERVER from "../../config";
 
 const AddProduct = () => {
     const [image, setImage] = useState(null); // Initialize image state with null
