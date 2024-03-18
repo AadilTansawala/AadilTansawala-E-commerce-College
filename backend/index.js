@@ -3,9 +3,13 @@ const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const multer = require("multer");
 const path = require("path");
+const cors = require("cors"); // Import the CORS middleware
 
 const app = express();
 const port = process.env.PORT || 4000; // Use the environment port or default to 4000
+
+// Use CORS middleware to allow requests from any origin
+app.use(cors());
 
 // Add the following middleware to enable CORS
 app.use((req, res, next) => {
