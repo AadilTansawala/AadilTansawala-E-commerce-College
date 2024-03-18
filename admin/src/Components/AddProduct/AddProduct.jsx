@@ -47,7 +47,7 @@ const AddProduct = () => {
                 product.image = responseData.imageUrl;
                 console.log(product);
                 // Send a POST request to add the product
-                const addProductResponse = await fetch(`${SERVER}/addproduct`, {
+                const addProductResponse = await fetch(`${SERVER}addproduct`, {
                     method: 'POST',
                     headers: {
                         Accept: 'application/json',
