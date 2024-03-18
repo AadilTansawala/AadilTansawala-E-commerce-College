@@ -1,9 +1,11 @@
 import { useState } from "react";
 import "./AddProduct.css";
 import upload_area from "../../Assets/upload_area.svg";
-import SERVER from "../../config";
+
 
 const AddProduct = () => {
+
+    const SERVER = "https://aadil-tansawala-e-commerce-college-api.vercel.app/";
     const [image, setImage] = useState(null); // Initialize image state with null
     const [productDetails, setProductDetails] = useState({
         name: "",

@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import "./ListProduct.css"
 import cross_Icon from "../../Assets/cross_icon.png"
-import SERVER from "../../config";
+
 
 
 const ListProduct = () => {
 
+    const SERVER = "https://aadil-tansawala-e-commerce-college-api.vercel.app/";
     const [allproducts, setAllProducts] = useState([]);
 
     const fetchInfo = async () => {
