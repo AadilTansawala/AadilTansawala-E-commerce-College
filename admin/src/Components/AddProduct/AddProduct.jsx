@@ -5,7 +5,7 @@ import upload_area from "../../Assets/upload_area.svg";
 
 const AddProduct = () => {
 
-    const SERVER = "https://aadil-tansawala-e-commerce-college-api.vercel.app/";
+    const SERVER = "http://localhost:4000/";
     const [image, setImage] = useState(null); // Initialize image state with null
     const [productDetails, setProductDetails] = useState({
         name: "",
@@ -105,7 +105,7 @@ const AddProduct = () => {
                 <input onChange={imageHandler} type="file" name="image" id="file-input" hidden />
             </div>
 
-            <button onClick={() => { Add_Product() }} className="add-product-button">
+            <button onClick={() => {Add_Product()}} className="add-product-button">
                 ADD
             </button>
         </div>

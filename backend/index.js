@@ -1,34 +1,26 @@
+const port = 4000;
 const express = require("express");
+const app = express();
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const multer = require("multer");
 const path = require("path");
-const cors = require("cors"); // Import the CORS middleware
-
-const app = express();
-const port = process.env.PORT || 4000; // Use the environment port or default to 4000
-
-// Use CORS middleware to allow requests from any origin
-app.use(cors());
-
-// Handle preflight requests for all routes
-app.options('*', cors());
-
-
-
+const cors = require("cors");
 
 app.use(express.json());
+app.use(cors());
 
 // Database Connection with MongoDB
-mongoose.connect("mongodb+srv://aadil:07070707@cluster0.x4wrsel.mongodb.net/E-COMMERCE", {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
+mongoose.connect("mongodb+srv://aadil:07070707@cluster0.x4wrsel.mongodb.net/E-COMMERCE");
+
+// API Creation
+app.get("/", (req, res) => {
+    res.send("Express app is Running ");
 });
 
 // Image Storage Engine
-// Configure Multer to use the /tmp directory for storing uploads
 const storage = multer.diskStorage({
-    destination: '/tmp', // Use /tmp directory for temporary storage
+    destination: './upload/images',
     filename: (req, file, cb) => {
         cb(null, `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`);
     }
@@ -38,8 +30,16 @@ const upload = multer({ storage: storage });
 
 // Creating Upload Endpoints for images
 // Serve static files (images) from the 'upload/images' directory
-app.use('/images', express.static(path.join(__dirname, 'upload/images')));
+app.use('/images', express.static('upload/images'));
 
+// Route for handling file uploads
+app.post("/upload", upload.single('product'), (req, res) => {
+    // If file upload is successful, return a JSON response with success status and image URL
+    res.json({
+        success: 1,
+        imageUrl: `http://${req.hostname}:${port}/images/${req.file.filename}`
+    });
+});
 
 // Schema for Creating Products
 const productSchema = new mongoose.Schema({
@@ -82,66 +82,94 @@ const productSchema = new mongoose.Schema({
 const Product = mongoose.model("Product", productSchema);
 
 
-// Add a new product
-app.post("/addproduct", async (req, res) => {
+app.post('/addproduct', async (req, res) => {
     try {
-      // Fetch all products from the database
-      const products = await Product.find({});
-      // Initialize a new ID for the product
-      let id = products.length > 0 ? products[products.length - 1].id + 1 : 1;
-  
-      // Create a new product instance using the Product model
-      const product = new Product({
-        id: id,
-        name: req.body.name,
-        image: req.body.image,
-        category: req.body.category,
-        new_price: req.body.new_price,
-        old_price: req.body.old_price,
-      });
-  
-      // Save the product to the database
-      await product.save();
-  
-      // Send a success response
-      res.status(201).json({ success: true, message: "Product added successfully" });
+        // Fetch all products from the database
+        let products = await Product.find({});
+
+        // Initialize a variable to hold the new ID
+        let id;
+
+        // Check if there are existing products
+        if (products.length > 0) {
+            // Get the last product from the array
+            let lastProduct = products[products.length - 1];
+
+            // Increment the last product's ID by one to generate a new ID
+            id = lastProduct.id + 1;
+        } else {
+            // If there are no existing products, start with ID 1
+            id = 1;
+        }
+
+        // Create a new product instance using the Product model
+        const product = new Product({
+            id: id,
+            name: req.body.name,
+            image: req.body.image,
+            category: req.body.category,
+            new_price: req.body.new_price,
+            old_price: req.body.old_price,
+        });
+
+        console.log(product);
+        // Save the product to the database
+        await product.save();
+        console.log("Saved");
+
+        res.status(201).json({
+            success: true,
+            message: "Product added successfully",
+            name: req.body.name,
+        });
+
     } catch (error) {
-      // If an error occurs, handle it and send an error response
-      console.error("Error adding product:", error);
-      res.status(500).json({ success: false, error: "An error occurred while adding the product" });
+        // If an error occurs, handle it and send an error response
+        console.error("Error adding product:", error);
+        res.status(500).json({ success: false, error: "An error occurred while adding the product" });
     }
-  });
-  
-  // Remove a product
-  app.post("/removeproduct", async (req, res) => {
+});
+
+//Creating API for deleting Products
+
+app.post('/removeproduct', async (req, res) => {
     try {
-      // Find and delete the product with the specified ID
-      const { id } = req.body;
-      await Product.findOneAndDelete({ _id: id });
-  
-      // Send a success response
-      res.json({ success: true, message: "Product removed successfully" });
+        // Find and delete the product with the specified ID
+        await Product.findOneAndDelete({ id: req.body.id });
+
+        // Log a message to indicate that the product has been removed
+        console.log("Product Removed");
+
+        // Send a success response with the name of the deleted product
+        res.json({
+            success: true,
+            name: req.body.name
+        });
     } catch (error) {
-      // If an error occurs, handle it and send an error response
-      console.error("Error removing product:", error);
-      res.status(500).json({ success: false, error: "An error occurred while removing the product" });
+        // If an error occurs, handle it and send an error response
+        console.error("Error removing product:", error);
+        res.status(500).json({ success: false, error: "An error occurred while removing the product" });
     }
-  });
-  
-  // Get all products
-  app.get("/allproducts", async (req, res) => {
+});
+
+// Creating API for getting all products
+
+app.get('/allproducts', async (req, res) => {
     try {
-      // Fetch all products from the database
-      const products = await Product.find({});
-  
-      // Send the fetched products as a response
-      res.json(products);
+        // Fetch all products from the database
+        let products = await Product.find({});
+
+        // Log a message to indicate that all products have been fetched
+        console.log("All Products Fetched");
+
+        // Send the fetched products as a response
+        res.json(products);
     } catch (error) {
-      // If an error occurs, handle it and send an error response
-      console.error("Error fetching products:", error);
-      res.status(500).json({ success: false, error: "An error occurred while fetching products" });
+        // If an error occurs, handle it and send an error response
+        console.error("Error fetching products:", error);
+        res.status(500).json({ success: false, error: "An error occurred while fetching products" });
     }
-  });
+});
 
 
 // Schema Creation for User Model
@@ -173,8 +201,18 @@ const Users = mongoose.model("Users", userSchema);
 
 //Creating Endpoints for registering the user
 // This route handles user sign up
+const validateEmail = (email) => {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(String(email).toLowerCase());
+};
+
 app.post('/signup', async (req, res) => {
     try {
+        // Validate email
+        if (!validateEmail(req.body.email)) {
+            return res.status(400).json({ success: false, errors: "Invalid email address" });
+        }
+
         // Check if the user with the provided email already exists
         let check = await Users.findOne({ email: req.body.email });
 
@@ -216,6 +254,7 @@ app.post('/signup', async (req, res) => {
         res.status(500).json({ success: false, errors: "Internal server error" });
     }
 });
+
 
 
 // Creating endpoint for user login
@@ -403,5 +442,3 @@ app.listen(port, (error) => {
         console.log("Error: " + error);
     }
 });
-
-module.exports = app;
