@@ -8,15 +8,15 @@ const path = require("path");
 const cors = require("cors");
 
 app.use(express.json());
-app.options(['/allproducts', '/removeproduct' , '/upload' , '/addproduct' ,'/images'], cors());
+
+// CORS configuration for all endpoints
+app.options(['/allproducts', '/removeproduct', '/upload', '/addproduct', '/images'], cors());
 
 // Database Connection with MongoDB
-mongoose.connect("mongodb+srv://aadil:07070707@cluster0.x4wrsel.mongodb.net/E-COMMERCE");
+mongoose.connect("mongodb+srv://aadil:07070707@cluster0.x4wrsel.mongodb.net/E-COMMERCE", { useNewUrlParser: true, useUnifiedTopology: true });
 
-// API Creation
-app.get("/", (req, res) => {
-    res.send("Express app is Running ");
-});
+// Serve static files (images) from the 'upload/images' directory
+app.use('/images', express.static('upload/images'));
 
 // Image Storage Engine
 const storage = multer.diskStorage({
@@ -28,17 +28,13 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-// Creating Upload Endpoints for images
-// Serve static files (images) from the 'upload/images' directory
-app.use('/images', express.static('upload/images'));
-
 // Route for handling file uploads
 app.post("/upload", upload.single('product'), (req, res) => {
     console.log(req.hostname);
     // If file upload is successful, return a JSON response with success status and image URL
     res.json({
         success: 1,
-        imageUrl: `http://${req.hostname}/images/${req.file.filename}`
+        imageUrl: `https://aadil-tansawala-e-commerce-college-api.vercel.app/images/${req.file.filename}`
     });
 });
 
@@ -82,7 +78,7 @@ const productSchema = new mongoose.Schema({
 // Create a model based on the product schema
 const Product = mongoose.model("Product", productSchema);
 
-
+//Creating API for adding Products
 app.post('/addproduct', async (req, res) => {
     try {
         // Fetch all products from the database
@@ -113,10 +109,8 @@ app.post('/addproduct', async (req, res) => {
             old_price: req.body.old_price,
         });
 
-        console.log(product);
         // Save the product to the database
         await product.save();
-        console.log("Saved");
 
         res.status(201).json({
             success: true,
@@ -132,7 +126,6 @@ app.post('/addproduct', async (req, res) => {
 });
 
 //Creating API for deleting Products
-
 app.post('/removeproduct', async (req, res) => {
     try {
         // Find and delete the product with the specified ID
@@ -154,7 +147,6 @@ app.post('/removeproduct', async (req, res) => {
 });
 
 // Creating API for getting all products
-
 app.get('/allproducts', async (req, res) => {
     try {
         // Fetch all products from the database
