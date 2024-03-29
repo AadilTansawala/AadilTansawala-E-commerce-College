@@ -26,7 +26,7 @@ const storage = multer.diskStorage({
     }
 });
 
-const upload = multer({ storage: storage });
+const upload = multer({ storage: multer.memoryStorage() });
 
 // Route for handling file uploads
 app.post("/upload", upload.single('product'), (req, res) => {
