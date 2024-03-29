@@ -33,15 +33,17 @@ app.post("/upload", upload.single('product'), (req, res) => {
     // Check if file upload is successful
     if (req.file) {
         // If file upload is successful, return a JSON response with success status and image URL
+        const imageUrl = req.protocol + '://' + req.get('host') + '/images/' + req.file.filename;
         res.json({
             success: 1,
-            imageUrl: `/images/${req.file.filename}` // Using a relative URL
+            imageUrl: imageUrl
         });
     } else {
         // If file upload fails, return an error response
         res.status(400).json({ success: 0, error: "File upload failed" });
     }
 });
+
 
 // Error handling middleware
 app.use((err, req, res, next) => {

@@ -43,6 +43,7 @@ const AddProduct = () => {
             }).then((resp) => resp.json()).then((data) => { responseData = data })
 
             if (responseData.success) {
+                console.log(responseData.imageUrl);
                 // Update productDetails with the image URL
                 product.image = responseData.imageUrl;
                 console.log(product);
