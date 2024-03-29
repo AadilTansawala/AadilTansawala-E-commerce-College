@@ -13,7 +13,7 @@ app.use(express.json());
 app.options(['/allproducts', '/removeproduct', '/upload', '/addproduct', '/images'], cors());
 
 // Database Connection with MongoDB
-mongoose.connect("mongodb+srv://aadil:07070707@cluster0.x4wrsel.mongodb.net/E-COMMERCE", { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect("mongodb+srv://aadil:07070707@cluster0.x4wrsel.mongodb.net/E-COMMERCE");
 
 // Serve static files (images) from the 'upload/images' directory
 app.use('/images', express.static('upload/images'));
