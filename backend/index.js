@@ -23,8 +23,8 @@ const storage = multer.diskStorage({
     }
 });
 
-// Initialize multer middleware
-const upload = multer({ storage });
+// Use memory storage for file uploads instead of disk storage
+const upload = multer({ storage: multer.memoryStorage() });
 
 // Serve static files (images) from the 'public/images' directory
 app.use('/images', express.static('public/images'));
