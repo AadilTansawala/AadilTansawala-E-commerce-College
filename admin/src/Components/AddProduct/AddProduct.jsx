@@ -5,7 +5,7 @@ import upload_area from "../../Assets/upload_area.svg";
 
 const AddProduct = () => {
 
-    const SERVER = "http://localhost:4000/";
+    const SERVER = "https://aadil-tansawala-e-commerce-college-api.vercel.app/";
     const [image, setImage] = useState(null); // Initialize image state with null
     const [productDetails, setProductDetails] = useState({
         name: "",

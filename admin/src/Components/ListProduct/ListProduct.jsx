@@ -6,7 +6,7 @@ import cross_Icon from "../../Assets/cross_icon.png"
 
 const ListProduct = () => {
 
-    const SERVER = "http://localhost:4000/";
+    const SERVER = "https://aadil-tansawala-e-commerce-college-api.vercel.app/";
     const [allproducts, setAllProducts] = useState([]);
 
     const fetchInfo = async () => {
