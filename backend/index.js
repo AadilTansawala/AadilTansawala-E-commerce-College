@@ -30,13 +30,25 @@ const upload = multer({ storage: storage });
 
 // Route for handling file uploads
 app.post("/upload", upload.single('product'), (req, res) => {
-    console.log(req.hostname);
-    // If file upload is successful, return a JSON response with success status and image URL
-    res.json({
-        success: 1,
-        imageUrl: `/images/${req.file.filename}` // Using a relative URL
-    });
+    // Check if file upload is successful
+    if (req.file) {
+        // If file upload is successful, return a JSON response with success status and image URL
+        res.json({
+            success: 1,
+            imageUrl: `/images/${req.file.filename}` // Using a relative URL
+        });
+    } else {
+        // If file upload fails, return an error response
+        res.status(400).json({ success: 0, error: "File upload failed" });
+    }
 });
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).send('Something went wrong!');
+});
+
 
 // Schema for Creating Products
 const productSchema = new mongoose.Schema({
