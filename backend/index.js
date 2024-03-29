@@ -12,8 +12,23 @@ app.use(express.json());
 // CORS configuration for all endpoints
 app.options(['/allproducts', '/removeproduct', '/upload', '/addproduct', '/images'], cors());
 
+
 // Database Connection with MongoDB
-mongoose.connect("mongodb+srv://aadil:07070707@cluster0.x4wrsel.mongodb.net/E-COMMERCE");
+
+const connectWithRetry = () => {
+    mongoose.connect('mongodb+srv://aadil:07070707@cluster0.x4wrsel.mongodb.net/E-COMMERCE', { useNewUrlParser: true, useUnifiedTopology: true })
+        .then(() => {
+            console.log('Connected to MongoDB Atlas');
+        })
+        .catch((err) => {
+            console.error('Failed to connect to MongoDB Atlas:', err.message);
+            console.log('Retrying connection in 5 seconds...');
+            setTimeout(connectWithRetry, 5000); // Retry after 5 seconds
+        });
+};
+
+connectWithRetry();
+
 
 // Set up multer storage engine
 const storage = multer.memoryStorage({
