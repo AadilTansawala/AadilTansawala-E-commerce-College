@@ -28,7 +28,7 @@ const AddProduct = () => {
         console.log(productDetails); // Logging before state update
     
         try {
-            // Create FormData object and append the image file
+            // Create a FormData object and append the image file
             let formData = new FormData();
             formData.append('product', image);
     
@@ -70,6 +70,7 @@ const AddProduct = () => {
             console.error('Error adding product:', error);
         }
     };
+    
     
 
 
