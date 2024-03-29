@@ -16,7 +16,7 @@ app.options(['/allproducts', '/removeproduct', '/upload', '/addproduct', '/image
 mongoose.connect("mongodb+srv://aadil:07070707@cluster0.x4wrsel.mongodb.net/E-COMMERCE");
 
 // Set up multer storage engine
-const storage = multer.diskStorage({
+const storage = multer.memoryStorage({
     destination: './public/images', // Destination folder for storing uploaded images
     filename: (req, file, cb) => {
         cb(null, `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`);
