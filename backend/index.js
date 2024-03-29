@@ -25,16 +25,13 @@ const upload = multer({ storage: multer.memoryStorage() });
 app.post("/upload", upload.single('product'), (req, res) => {
     // Check if file upload is successful
     if (req.file) {
-        console.log("File uploaded successfully:", req.file); // Log the uploaded file information
-        // Construct the image URL with protocol, hostname, and port
-        const imageUrl = `${req.protocol}://${req.hostname}/images/${req.file.filename}`;
-        // Return a JSON response with success status and image URL
+        // If file upload is successful, return a JSON response with success status and image URL
+        const imageUrl = `http://${req.hostname}/images/${req.file.filename}`;
         res.json({
             success: 1,
             imageUrl: imageUrl
         });
     } else {
-        console.error("File upload failed:", req.file); // Log the failed file upload
         // If file upload fails, return an error response
         res.status(400).json({ success: 0, error: "File upload failed" });
     }

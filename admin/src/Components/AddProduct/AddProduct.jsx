@@ -26,49 +26,51 @@ const AddProduct = () => {
 
     const Add_Product = async () => {
         console.log(productDetails); // Logging before state update
-
-        let responseData;
-
-        let product = productDetails;
-        let formData = new FormData();
-        formData.append('product', image);
-
+    
         try {
-            await fetch(`${SERVER}upload`, {
+            // Create FormData object and append the image file
+            let formData = new FormData();
+            formData.append('product', image);
+    
+            // Upload the image file to the server
+            const uploadResponse = await fetch(`${SERVER}upload`, {
                 method: 'POST',
-                headers: {
-                    Accept: 'application/json',
-                },
                 body: formData,
-            }).then((resp) => resp.json()).then((data) => { responseData = data })
-
-            if (responseData.success) {
-                console.log(responseData.imageUrl);
+            });
+    
+            // Parse the response JSON data
+            const uploadData = await uploadResponse.json();
+    
+            // Check if the image upload was successful
+            if (uploadData.success) {
+                console.log(uploadData.imageUrl);
+    
                 // Update productDetails with the image URL
-                product.image = responseData.imageUrl;
-                console.log(product);
-                // Send a POST request to add the product
+                productDetails.image = uploadData.imageUrl;
+    
+                // Send a POST request to add the product with updated productDetails
                 const addProductResponse = await fetch(`${SERVER}addproduct`, {
                     method: 'POST',
                     headers: {
-                        Accept: 'application/json',
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(product),
+                    body: JSON.stringify(productDetails),
                 });
-
+    
                 // Parse the response JSON data for adding the product
                 const addProductData = await addProductResponse.json();
-
+    
                 // Display success or failure message based on response
                 addProductData.success ? alert("Product Added") : alert("Failed");
             } else {
+                // Display error message if image upload failed
                 alert("Failed to upload image");
             }
         } catch (error) {
             console.error('Error adding product:', error);
         }
     };
+    
 
 
 
