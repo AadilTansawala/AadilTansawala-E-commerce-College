@@ -437,6 +437,10 @@ app.post('/getcart', fetchUser, async (req, res) => {
     }
 });
 
+// Route handler for the root path
+app.get("/", (req, res) => {
+    res.send("Server is running.");
+});
 
 
 app.listen(port, (error) => {
