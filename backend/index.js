@@ -34,6 +34,7 @@ app.use('/images', express.static('upload/images'));
 
 // Route for handling file uploads
 app.post("/upload", upload.single('product'), (req, res) => {
+    console.log(req.hostname);
     // If file upload is successful, return a JSON response with success status and image URL
     res.json({
         success: 1,
