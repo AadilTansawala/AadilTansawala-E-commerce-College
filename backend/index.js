@@ -33,7 +33,7 @@ app.post("/upload", upload.single('product'), (req, res) => {
     // Check if file upload is successful
     if (req.file) {
         // If file upload is successful, return a JSON response with success status and image URL
-        const imageUrl = req.protocol + '://' + req.get('host') + '/images/' + req.file.filename;
+        const imageUrl = `${req.protocol}://${req.hostname}/images/${req.file.filename}`;
         res.json({
             success: 1,
             imageUrl: imageUrl
