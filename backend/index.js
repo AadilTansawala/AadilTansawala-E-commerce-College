@@ -34,7 +34,7 @@ app.post("/upload", upload.single('product'), (req, res) => {
     // If file upload is successful, return a JSON response with success status and image URL
     res.json({
         success: 1,
-        imageUrl: `https://aadil-tansawala-e-commerce-college-api.vercel.app/images/${req.file.filename}`
+        imageUrl: `/images/${req.file.filename}` // Using a relative URL
     });
 });
 
