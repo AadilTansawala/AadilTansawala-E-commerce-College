@@ -45,11 +45,8 @@ const AddProduct = () => {
             if (uploadData.success) {
                 console.log(uploadData.imageUrl);
     
-                // Clone the productDetails object to avoid mutating the original object
-                let updatedProductDetails = { ...productDetails };
-    
-                // Update the cloned productDetails with the image URL
-                updatedProductDetails.image = uploadData.imageUrl;
+                // Update productDetails with the image URL
+                productDetails.image = uploadData.imageUrl;
     
                 // Send a POST request to add the product with updated productDetails
                 const addProductResponse = await fetch(`${SERVER}addproduct`, {
@@ -57,7 +54,7 @@ const AddProduct = () => {
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(updatedProductDetails),
+                    body: JSON.stringify(productDetails),
                 });
     
                 // Parse the response JSON data for adding the product
@@ -73,7 +70,6 @@ const AddProduct = () => {
             console.error('Error adding product:', error);
         }
     };
-    
     
 
 
