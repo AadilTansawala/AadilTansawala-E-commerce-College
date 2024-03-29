@@ -18,33 +18,30 @@ mongoose.connect("mongodb+srv://aadil:07070707@cluster0.x4wrsel.mongodb.net/E-CO
 // Serve static files (images) from the 'upload/images' directory
 app.use('/images', express.static('upload/images'));
 
-// Image Storage Engine
-const storage = multer.diskStorage({
-    destination: './upload/images',
-    filename: (req, file, cb) => {
-        cb(null, `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`);
-    }
-});
-
+// Use memory storage for file uploads instead of disk storage
 const upload = multer({ storage: multer.memoryStorage() });
 
 // Route for handling file uploads
 app.post("/upload", upload.single('product'), (req, res) => {
-    // Check if file upload is successful
-    if (req.file) {
-        // If file upload is successful, return a JSON response with success status and image URL
-        const imageUrl = `http://aadil-tansawala-e-commerce-college-api.vercel.app:4000/images/${req.file.filename}`;
-        res.json({
-            success: 1,
-            imageUrl: imageUrl
-        });
-    } else {
-        // If file upload fails, return an error response
-        res.status(400).json({ success: 0, error: "File upload failed" });
+    try {
+        // Check if file upload is successful
+        if (req.file) {
+            // If file upload is successful, return a JSON response with success status and image URL
+            const imageUrl = `http://aadil-tansawala-e-commerce-college-api.vercel.app:4000/images/${req.file.filename}`;
+            res.json({
+                success: 1,
+                imageUrl: imageUrl
+            });
+        } else {
+            // If file upload fails, return an error response
+            res.status(400).json({ success: 0, error: "File upload failed" });
+        }
+    } catch (error) {
+        // If an error occurs, handle it and send an error response
+        console.error("Error uploading file:", error);
+        res.status(500).json({ success: 0, error: "Internal server error" });
     }
 });
-
-
 // Error handling middleware
 app.use((err, req, res, next) => {
     console.error(err.stack);
