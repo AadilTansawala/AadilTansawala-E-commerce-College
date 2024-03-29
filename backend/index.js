@@ -22,16 +22,25 @@ app.use('/images', express.static('upload/images'));
 const upload = multer({ storage: multer.memoryStorage() });
 
 // Route for handling file uploads
+// Route for handling file uploads
 app.post("/upload", upload.single('product'), (req, res) => {
-    // Construct the imageUrl without including the port number
-    const imageUrl = `${req.protocol}://${req.hostname}/images/${req.file.filename}`;
-
-    // If file upload is successful, return a JSON response with success status and image URL
-    res.json({
-        success: 1,
-        imageUrl: imageUrl // Using the constructed imageUrl
-    });
+    // Check if file upload is successful
+    if (req.file) {
+        console.log("File uploaded successfully:", req.file); // Log the uploaded file information
+        // Construct the image URL
+        const imageUrl = `/images/${req.file.filename}`;
+        // Return a JSON response with success status and image URL
+        res.json({
+            success: 1,
+            imageUrl: imageUrl
+        });
+    } else {
+        console.error("File upload failed:", req.file); // Log the failed file upload
+        // If file upload fails, return an error response
+        res.status(400).json({ success: 0, error: "File upload failed" });
+    }
 });
+
 
 // Error handling middleware
 app.use((err, req, res, next) => {
