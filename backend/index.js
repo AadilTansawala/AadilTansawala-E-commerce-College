@@ -15,18 +15,26 @@ app.options(['/allproducts', '/removeproduct', '/upload', '/addproduct', '/image
 // Database Connection with MongoDB
 mongoose.connect("mongodb+srv://aadil:07070707@cluster0.x4wrsel.mongodb.net/E-COMMERCE");
 
-// Serve static files (images) from the 'upload/images' directory
-app.use('/images', express.static('upload/images'));
+// Set up multer storage engine
+const storage = multer.diskStorage({
+    destination: './public/images', // Destination folder for storing uploaded images
+    filename: (req, file, cb) => {
+        cb(null, `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`);
+    }
+});
 
-// Use memory storage for file uploads instead of disk storage
-const upload = multer({ storage: multer.memoryStorage() });
+// Initialize multer middleware
+const upload = multer({ storage });
+
+// Serve static files (images) from the 'public/images' directory
+app.use('/images', express.static('public/images'));
 
 // Route for handling file uploads
 app.post("/upload", upload.single('product'), (req, res) => {
     // Check if file upload is successful
     if (req.file) {
         // If file upload is successful, return a JSON response with success status and image URL
-        const imageUrl = `http://aadil-tansawala-e-commerce-college-api.vercel.app/images/${req.file.filename}`;
+        const imageUrl = `/images/${req.file.filename}`; // Relative URL
         res.json({
             success: 1,
             imageUrl: imageUrl
