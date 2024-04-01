@@ -30,6 +30,9 @@ const AddProduct = () => {
             formData.append('new_price', productDetails.new_price);
             formData.append('old_price', productDetails.old_price);
 
+            console.log('FormData:', formData); // Log FormData object
+
+
             const uploadResponse = await fetch(`${SERVER}upload`, {
                 method: 'POST',
                 body: formData,
