@@ -31,7 +31,7 @@ const AddProduct = () => {
         formData.append('product', image);
 
         try {
-            await fetch('http://localhost:4000/upload', {
+            await fetch('https://aadiltansawala-e-commerce-college-api.onrender.com/upload', {
                 method: 'POST',
                 headers: {
                     Accept: 'application/json',
@@ -44,7 +44,7 @@ const AddProduct = () => {
                 product.image = responseData.imageUrl;
                 console.log(product);
                 // Send a POST request to add the product
-                const addProductResponse = await fetch('http://localhost:4000/addproduct', {
+                const addProductResponse = await fetch('https://aadiltansawala-e-commerce-college-api.onrender.com/addproduct', {
                     method: 'POST',
                     headers: {
                         Accept: 'application/json',
