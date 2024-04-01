@@ -50,6 +50,13 @@ const upload = multer({ storage: storage });
 // Serve static files (images) from the 'upload/images' directory
 app.use('/images', express.static('upload/images'));
 
+// Middleware to set cache control headers for static files
+app.use('/images', (req, res, next) => {
+    res.setHeader('Cache-Control', 'public, max-age=31536000'); // Cache images for 1 year
+    next();
+});
+
+
 // Route for handling file uploads
 app.post("/upload", upload.single('product'), (req, res) => {
     // If file upload is successful, return a JSON response with success status and image URL
