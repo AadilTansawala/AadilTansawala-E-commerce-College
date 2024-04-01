@@ -16,7 +16,7 @@ app.use(cors());
 
 // Add your routes here
 // For example:
-app.options(['/allproducts', '/removeproduct', '/upload', '/addproduct', '/images'], cors());
+app.options('*', cors());
 
 
 // Database Connection with MongoDB
