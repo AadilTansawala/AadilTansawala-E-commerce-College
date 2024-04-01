@@ -31,14 +31,14 @@ connectWithRetry();
 
 
 // Set up multer storage engine
-const storage = multer.memoryStorage({
+const storage = multer.diskStorage({
     destination: './public/images', // Destination folder for storing uploaded images
     filename: (req, file, cb) => {
         cb(null, `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`);
     }
 });
 
-// Use memory storage for file uploads instead of disk storage
+// Use disk storage for file uploads
 const upload = multer({ storage: storage });
 
 // Serve static files (images) from the 'public/images' directory
@@ -48,7 +48,7 @@ app.use('/images', express.static('public/images'));
 app.post("/upload", upload.single('product'), (req, res) => {
     // Check if file upload is successful
     if (req.file) {
-        // If file upload is successful, construct the image URL with the server URL
+        // If file upload is successful, construct the image URL with the server URL and filename
         const imageUrl = `https://aadil-tansawala-e-commerce-college-api.vercel.app/images/${req.file.filename}`;
         
         // Return a JSON response with success status and the constructed image URL
