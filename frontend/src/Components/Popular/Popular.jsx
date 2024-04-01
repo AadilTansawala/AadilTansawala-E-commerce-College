@@ -5,7 +5,7 @@ import Item from '../Item/Item'
 
 const Popular = () => {
 
-    const SERVER = "https://aadil-tansawala-e-commerce-college-api.vercel.app/";
+    const SERVER = "https://aadiltansawala-e-commerce-college-api.onrender.com/";
     const [popular_products , setPopular_products] = useState([]);
 
      // Fetch popular women products when the component mounts

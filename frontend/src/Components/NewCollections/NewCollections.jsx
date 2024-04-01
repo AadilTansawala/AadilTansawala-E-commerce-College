@@ -3,7 +3,7 @@ import './NewCollections.css'
 import Item from '../Item/Item'
 const NewCollections = () => {
 
-    const SERVER = "https://aadil-tansawala-e-commerce-college-api.vercel.app/";
+    const SERVER = "https://aadiltansawala-e-commerce-college-api.onrender.com/";
     const [new_collection , setNew_collection] = useState([]);
 
      // Fetch new products when the component mounts

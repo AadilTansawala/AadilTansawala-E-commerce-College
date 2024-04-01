@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect } from "react";
-const SERVER = "https://aadil-tansawala-e-commerce-college-api.vercel.app/";
+const SERVER = "https://aadiltansawala-e-commerce-college-api.onrender.com/";
 
 export const ShopContext = createContext(null);
 
