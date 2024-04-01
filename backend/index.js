@@ -46,7 +46,7 @@ app.post("/upload", upload.single('product'), (req, res) => {
     // Check if file upload is successful
     if (req.file) {
         // If file upload is successful, construct the image URL with the server URL
-        const imageUrl = `https://aadil-tansawala-e-commerce-college-api.vercel.app${req.file.filename}`;
+        const imageUrl = `https://aadil-tansawala-e-commerce-college-api.vercel.app/images/${req.file.filename}`;
         
         // Return a JSON response with success status and the constructed image URL
         res.json({
