@@ -32,7 +32,10 @@ connectWithRetry();
 
 // Set up multer storage engine
 const storage = multer.memoryStorage({
-    // No need for destination or filename when using memoryStorage
+    destination: './public/images', // Destination folder for storing uploaded images
+    filename: (req, file, cb) => {
+        cb(null, `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`);
+    }
 });
 
 // Use memory storage for file uploads instead of disk storage
