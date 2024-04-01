@@ -31,14 +31,14 @@ connectWithRetry();
 
 
 // Set up multer storage engine
-const storage = multer.memoryStorage({
+const storage = multer.diskStorage({
     destination: './public/images', // Destination folder for storing uploaded images
     filename: (req, file, cb) => {
         cb(null, `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`);
     }
 });
 
-// Use memory storage for file uploads instead of disk storage
+// Use disk storage for file uploads
 const upload = multer({ storage: storage });
 
 // Serve static files (images) from the 'public/images' directory
@@ -46,30 +46,21 @@ app.use('/images', express.static('public/images'));
 
 // Route for handling file uploads
 app.post("/upload", upload.single('product'), (req, res) => {
-    try {
-        // Check if file upload is successful
-        if (req.file && req.file.filename) {
-            // If file upload is successful, construct the image URL with the server URL
-            const imageUrl = `https://aadil-tansawala-e-commerce-college-api.vercel.app/images/${req.file.filename}`;
-
-            // Return a JSON response with success status and the constructed image URL
-            res.json({
-                success: 1,
-                imageUrl: imageUrl
-            });
-        } else {
-            // If file upload fails, return an error response
-            console.error("File upload failed. No file found in request.");
-            res.status(400).json({ success: 0, error: "File upload failed. No file found in request." });
-        }
-    } catch (error) {
-        // Handle any unexpected errors
-        console.error("Error uploading file:", error);
-        res.status(500).json({ success: 0, error: "Internal server error." });
+    // Check if file upload is successful
+    if (req.file) {
+        // If file upload is successful, construct the image URL with the server URL and filename
+        const imageUrl = `https://aadil-tansawala-e-commerce-college-api.vercel.app/images/${req.file.filename}`;
+        
+        // Return a JSON response with success status and the constructed image URL
+        res.json({
+            success: 1,
+            imageUrl: imageUrl
+        });
+    } else {
+        // If file upload fails, return an error response
+        res.status(400).json({ success: 0, error: "File upload failed" });
     }
 });
-
-
 
 
 
