@@ -5,8 +5,8 @@ import { useState } from 'react';
 
 const LoginSignup = () => {
 
-  const SERVER = "https://aadil-tansawala-e-commerce-college-api.vercel.app/";
-  const [state, setState] = useState("Log in");
+  const SERVER = "https://aadiltansawala-e-commerce-college-api.onrender.com/";
+    const [state, setState] = useState("Log in");
   const [formData, setFormData] = useState({
     username: "",
     password: "",
