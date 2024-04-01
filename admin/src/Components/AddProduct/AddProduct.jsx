@@ -14,8 +14,11 @@ const AddProduct = () => {
     });
 
     const imageHandler = (e) => {
-        setImage(e.target.files[0]);
+        const selectedFile = e.target.files[0]; // Get the selected file
+        console.log("Selected file:", selectedFile); // Log the selected file to check if it's captured correctly
+        setImage(selectedFile); // Update the image state with the selected file
     };
+    
 
     const changeHandler = (e) => {
         setProductDetails({ ...productDetails, [e.target.name]: e.target.value });
