@@ -45,11 +45,10 @@ const upload = multer({ storage: storage });
 app.use('/images', express.static('public/images'));
 
 // Route for handling file uploads
-// Route for handling file uploads
 app.post("/upload", upload.single('product'), (req, res) => {
     try {
         // Check if file upload is successful
-        if (req.file) {
+        if (req.file && req.file.filename) {
             // If file upload is successful, construct the image URL with the server URL
             const imageUrl = `https://aadil-tansawala-e-commerce-college-api.vercel.app/images/${req.file.filename}`;
 
@@ -69,6 +68,7 @@ app.post("/upload", upload.single('product'), (req, res) => {
         res.status(500).json({ success: 0, error: "Internal server error." });
     }
 });
+
 
 
 
