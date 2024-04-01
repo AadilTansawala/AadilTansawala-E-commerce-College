@@ -7,6 +7,7 @@ const multer = require("multer");
 const path = require("path");
 const cors = require("cors");
 const os = require('os');
+const fetch = require('node-fetch');
 
 app.use(express.json());
 
@@ -32,35 +33,44 @@ connectWithRetry();
 
 
 // Set up multer storage engine with a temporary directory
-const storage = multer.diskStorage({
-    destination: os.tmpdir(), // Use the temporary directory provided by the operating system
-    filename: (req, file, cb) => {
-        cb(null, `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`);
-    }
-});
+const storage = multer.memoryStorage(); // Use memory storage for file uploads
 
-// Use disk storage for file uploads
+// Use multer to handle file uploads
 const upload = multer({ storage: storage });
 
-// Serve static files (images) from the temporary directory
-app.use('/images', express.static(os.tmpdir()));
-
 // Route for handling file uploads
-app.post("/upload", upload.single('product'), (req, res) => {
+app.post("/upload", upload.single('product'), async (req, res) => {
     // Check if file upload is successful
     if (req.file) {
-        // If file upload is successful, construct the image URL with the server URL and filename
-        const imageUrl = `https://aadil-tansawala-e-commerce-college-api.vercel.app/images/${req.file.filename}`;
-        
-        // Return a JSON response with success status and the constructed image URL
-        res.json({
-            success: 1,
-            imageUrl: imageUrl
-        });
-    } else {
-        // If file upload fails, return an error response
-        res.status(400).json({ success: 0, error: "File upload failed" });
+        try {
+            // Upload file to Vercel File Storage
+            const fileUploadResponse = await fetch('https://api.vercel.com/v2/now/files', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer vercel_blob_rw_jEU97Ire8jitJxD7_Vm2QjaPQmI8UWxNXnSMxpv7s4z3ldc',
+                    'Content-Type': req.file.mimetype,
+                },
+                body: req.file.buffer, // Use file buffer as request body
+            });
+
+            if (fileUploadResponse.ok) {
+                // File upload successful, construct the image URL with the provided URL from Vercel File Storage
+                const fileUploadData = await fileUploadResponse.json();
+                const imageUrl = fileUploadData.url;
+
+                // Return a JSON response with success status and the constructed image URL
+                return res.json({
+                    success: 1,
+                    imageUrl: imageUrl
+                });
+            }
+        } catch (error) {
+            console.error('Error uploading file to Vercel:', error);
+        }
     }
+    
+    // If file upload fails, return an error response
+    return res.status(400).json({ success: 0, error: "File upload failed" });
 });
 
 
