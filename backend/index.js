@@ -16,7 +16,7 @@ app.use(cors());
 
 // Add your routes here
 // For example:
-app.options(['/allproducts', '/removeproduct', '/upload', '/addproduct', '/images' ,'/signup','/login','/newcollections','/popularinwomen' ,'/addtocart' ,'/removefromcart' , '/getcart'], cors());
+app.options(['/allproducts', '/removeproduct', '/upload', '/addproduct', '/images'], cors());
 
 
 // Database Connection with MongoDB
@@ -49,13 +49,6 @@ const upload = multer({ storage: storage });
 // Creating Upload Endpoints for images
 // Serve static files (images) from the 'upload/images' directory
 app.use('/images', express.static('upload/images'));
-
-// Middleware to set cache control headers for static files
-app.use('/images', (req, res, next) => {
-    res.setHeader('Cache-Control', 'public, max-age=31536000'); // Cache images for 1 year
-    next();
-});
-
 
 // Route for handling file uploads
 app.post("/upload", upload.single('product'), (req, res) => {
