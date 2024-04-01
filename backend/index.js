@@ -45,22 +45,31 @@ const upload = multer({ storage: storage });
 app.use('/images', express.static('public/images'));
 
 // Route for handling file uploads
+// Route for handling file uploads
 app.post("/upload", upload.single('product'), (req, res) => {
-    // Check if file upload is successful
-    if (req.file) {
-        // If file upload is successful, construct the image URL with the server URL
-        const imageUrl = `https://aadil-tansawala-e-commerce-college-api.vercel.app/images/${req.file.filename}`;
-        
-        // Return a JSON response with success status and the constructed image URL
-        res.json({
-            success: 1,
-            imageUrl: imageUrl
-        });
-    } else {
-        // If file upload fails, return an error response
-        res.status(400).json({ success: 0, error: "File upload failed" });
+    try {
+        // Check if file upload is successful
+        if (req.file) {
+            // If file upload is successful, construct the image URL with the server URL
+            const imageUrl = `https://aadil-tansawala-e-commerce-college-api.vercel.app/images/${req.file.filename}`;
+
+            // Return a JSON response with success status and the constructed image URL
+            res.json({
+                success: 1,
+                imageUrl: imageUrl
+            });
+        } else {
+            // If file upload fails, return an error response
+            console.error("File upload failed. No file found in request.");
+            res.status(400).json({ success: 0, error: "File upload failed. No file found in request." });
+        }
+    } catch (error) {
+        // Handle any unexpected errors
+        console.error("Error uploading file:", error);
+        res.status(500).json({ success: 0, error: "Internal server error." });
     }
 });
+
 
 
 
