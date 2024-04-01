@@ -6,17 +6,31 @@ const jwt = require("jsonwebtoken");
 const multer = require("multer");
 const path = require("path");
 const cors = require("cors");
+const os = require('os');
+
 
 app.use(express.json());
-app.use(cors());
+
+// CORS configuration for all endpoints
+app.options(['/allproducts', '/removeproduct', '/upload', '/addproduct', '/images'], cors());
+
 
 // Database Connection with MongoDB
-mongoose.connect("mongodb+srv://aadil:07070707@cluster0.x4wrsel.mongodb.net/E-COMMERCE");
 
-// API Creation
-app.get("/", (req, res) => {
-    res.send("Express app is Running ");
-});
+const connectWithRetry = () => {
+    mongoose.connect('mongodb+srv://aadil:07070707@cluster0.x4wrsel.mongodb.net/E-COMMERCE', { useNewUrlParser: true, useUnifiedTopology: true })
+        .then(() => {
+            console.log('Connected to MongoDB Atlas');
+        })
+        .catch((err) => {
+            console.error('Failed to connect to MongoDB Atlas:', err.message);
+            console.log('Retrying connection in 5 seconds...');
+            setTimeout(connectWithRetry, 5000); // Retry after 5 seconds
+        });
+};
+
+connectWithRetry();
+
 
 // Image Storage Engine
 const storage = multer.diskStorage({
@@ -40,6 +54,17 @@ app.post("/upload", upload.single('product'), (req, res) => {
         imageUrl: `http://${req.hostname}:${port}/images/${req.file.filename}`
     });
 });
+
+
+
+
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).send('Something went wrong!');
+});
+
 
 // Schema for Creating Products
 const productSchema = new mongoose.Schema({
@@ -81,7 +106,7 @@ const productSchema = new mongoose.Schema({
 // Create a model based on the product schema
 const Product = mongoose.model("Product", productSchema);
 
-
+//Creating API for adding Products
 app.post('/addproduct', async (req, res) => {
     try {
         // Fetch all products from the database
@@ -112,10 +137,8 @@ app.post('/addproduct', async (req, res) => {
             old_price: req.body.old_price,
         });
 
-        console.log(product);
         // Save the product to the database
         await product.save();
-        console.log("Saved");
 
         res.status(201).json({
             success: true,
@@ -131,7 +154,6 @@ app.post('/addproduct', async (req, res) => {
 });
 
 //Creating API for deleting Products
-
 app.post('/removeproduct', async (req, res) => {
     try {
         // Find and delete the product with the specified ID
@@ -153,7 +175,6 @@ app.post('/removeproduct', async (req, res) => {
 });
 
 // Creating API for getting all products
-
 app.get('/allproducts', async (req, res) => {
     try {
         // Fetch all products from the database
@@ -201,8 +222,18 @@ const Users = mongoose.model("Users", userSchema);
 
 //Creating Endpoints for registering the user
 // This route handles user sign up
+const validateEmail = (email) => {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(String(email).toLowerCase());
+};
+
 app.post('/signup', async (req, res) => {
     try {
+        // Validate email
+        if (!validateEmail(req.body.email)) {
+            return res.status(400).json({ success: false, errors: "Invalid email address" });
+        }
+
         // Check if the user with the provided email already exists
         let check = await Users.findOne({ email: req.body.email });
 
@@ -244,6 +275,7 @@ app.post('/signup', async (req, res) => {
         res.status(500).json({ success: false, errors: "Internal server error" });
     }
 });
+
 
 
 // Creating endpoint for user login
@@ -422,6 +454,10 @@ app.post('/getcart', fetchUser, async (req, res) => {
     }
 });
 
+// Route handler for the root path
+app.get("/", (req, res) => {
+    res.send("Server is running.");
+});
 
 
 app.listen(port, (error) => {
