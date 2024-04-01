@@ -4,12 +4,12 @@ import upload_area from "../../Assets/upload_area.svg";
 
 
 const AddProduct = () => {
-
     const SERVER = "https://aadil-tansawala-e-commerce-college-api.vercel.app/";
-    const [image, setImage] = useState(null); // Initialize image state with null
+
+    const [image, setImage] = useState(null);
     const [productDetails, setProductDetails] = useState({
         name: "",
-        image: "", // Initialize image property with an empty string
+        image: "",
         category: "men",
         new_price: "",
         old_price: ""
@@ -17,7 +17,6 @@ const AddProduct = () => {
 
     const imageHandler = (e) => {
         setImage(e.target.files[0]);
-        console.log(image);// Update image state with the selected file
     };
 
     const changeHandler = (e) => {
@@ -25,30 +24,26 @@ const AddProduct = () => {
     };
 
     const Add_Product = async () => {
-        console.log(productDetails); // Logging before state update
-    
         try {
-            // Create a FormData object and append the image file
             let formData = new FormData();
             formData.append('product', image);
     
-            // Upload the image file to the server
+            console.log("FormData:", formData);
+    
             const uploadResponse = await fetch(`${SERVER}upload`, {
                 method: 'POST',
                 body: formData,
             });
     
-            // Parse the response JSON data
+            if (!uploadResponse.ok) {
+                throw new Error('Failed to upload image');
+            }
+    
             const uploadData = await uploadResponse.json();
     
-            // Check if the image upload was successful
             if (uploadData.success) {
-                console.log(uploadData.imageUrl);
-    
-                // Update productDetails with the image URL
                 productDetails.image = uploadData.imageUrl;
     
-                // Send a POST request to add the product with updated productDetails
                 const addProductResponse = await fetch(`${SERVER}addproduct`, {
                     method: 'POST',
                     headers: {
@@ -57,17 +52,19 @@ const AddProduct = () => {
                     body: JSON.stringify(productDetails),
                 });
     
-                // Parse the response JSON data for adding the product
+                if (!addProductResponse.ok) {
+                    throw new Error('Failed to add product');
+                }
+    
                 const addProductData = await addProductResponse.json();
     
-                // Display success or failure message based on response
-                addProductData.success ? alert("Product Added") : alert("Failed");
+                addProductData.success ? alert("Product Added") : alert("Failed to add product");
             } else {
-                // Display error message if image upload failed
                 alert("Failed to upload image");
             }
         } catch (error) {
-            console.error('Error adding product:', error);
+            console.error('Error adding product:', error.message);
+            alert('Error adding product: ' + error.message);
         }
     };
     
@@ -109,7 +106,7 @@ const AddProduct = () => {
                 <input onChange={imageHandler} type="file" name="image" id="file-input" hidden />
             </div>
 
-            <button onClick={() => {Add_Product()}} className="add-product-button">
+            <button onClick={Add_Product} className="add-product-button">
                 ADD
             </button>
         </div>
