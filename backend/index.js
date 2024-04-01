@@ -7,7 +7,7 @@ const multer = require("multer");
 const path = require("path");
 const cors = require("cors");
 const os = require('os');
-import fetch from 'node-fetch';
+import {fetch} from 'node-fetch';
 
 
 app.use(express.json());
