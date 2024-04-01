@@ -106,7 +106,7 @@ const AddProduct = () => {
                 <input onChange={imageHandler} type="file" name="image" id="file-input" hidden />
             </div>
 
-            <button onClick={Add_Product} className="add-product-button">
+            <button onClick={() => {Add_Product()}} className="add-product-button">
                 ADD
             </button>
         </div>
