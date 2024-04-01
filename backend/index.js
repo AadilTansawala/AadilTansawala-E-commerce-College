@@ -6,83 +6,40 @@ const jwt = require("jsonwebtoken");
 const multer = require("multer");
 const path = require("path");
 const cors = require("cors");
-const os = require('os');
-import {fetch} from 'node-fetch';
-
 
 app.use(express.json());
-
-// CORS configuration for all endpoints
-app.options(['/allproducts', '/removeproduct', '/upload', '/addproduct', '/images'], cors());
-
+app.use(cors());
 
 // Database Connection with MongoDB
+mongoose.connect("mongodb+srv://aadil:07070707@cluster0.x4wrsel.mongodb.net/E-COMMERCE");
 
-const connectWithRetry = () => {
-    mongoose.connect('mongodb+srv://aadil:07070707@cluster0.x4wrsel.mongodb.net/E-COMMERCE', { useNewUrlParser: true, useUnifiedTopology: true })
-        .then(() => {
-            console.log('Connected to MongoDB Atlas');
-        })
-        .catch((err) => {
-            console.error('Failed to connect to MongoDB Atlas:', err.message);
-            console.log('Retrying connection in 5 seconds...');
-            setTimeout(connectWithRetry, 5000); // Retry after 5 seconds
-        });
-};
+// API Creation
+app.get("/", (req, res) => {
+    res.send("Express app is Running ");
+});
 
-connectWithRetry();
+// Image Storage Engine
+const storage = multer.diskStorage({
+    destination: './upload/images',
+    filename: (req, file, cb) => {
+        cb(null, `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`);
+    }
+});
 
-
-// Set up multer storage engine with a temporary directory
-const storage = multer.memoryStorage(); // Use memory storage for file uploads
-
-// Use multer to handle file uploads
 const upload = multer({ storage: storage });
 
+// Creating Upload Endpoints for images
+// Serve static files (images) from the 'upload/images' directory
+app.use('/images', express.static('upload/images'));
+
 // Route for handling file uploads
-app.post("/upload", upload.single('product'), async (req, res) => {
-    // Check if file upload is successful
-    if (req.file) {
-        try {
-            // Upload file to Vercel File Storage
-            const fileUploadResponse = await fetch('https://api.vercel.com/v2/now/files', {
-                method: 'POST',
-                headers: {
-                    'Authorization': 'Bearer vercel_blob_rw_jEU97Ire8jitJxD7_Vm2QjaPQmI8UWxNXnSMxpv7s4z3ldc',
-                    'Content-Type': req.file.mimetype,
-                },
-                body: req.file.buffer, // Use file buffer as request body
-            });
-
-            if (fileUploadResponse.ok) {
-                // File upload successful, construct the image URL with the provided URL from Vercel File Storage
-                const fileUploadData = await fileUploadResponse.json();
-                const imageUrl = fileUploadData.url;
-
-                // Return a JSON response with success status and the constructed image URL
-                return res.json({
-                    success: 1,
-                    imageUrl: imageUrl
-                });
-            }
-        } catch (error) {
-            console.error('Error uploading file to Vercel:', error);
-        }
-    }
-    
-    // If file upload fails, return an error response
-    return res.status(400).json({ success: 0, error: "File upload failed" });
+app.post("/upload", upload.single('product'), (req, res) => {
+    // If file upload is successful, return a JSON response with success status and image URL
+    res.json({
+        success: 1,
+        imageUrl: `http://${req.hostname}:${port}/images/${req.file.filename}`
+    });
 });
-
-
-
-
-// Error handling middleware
-app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).send('Something went wrong!');
-});
-
 
 // Schema for Creating Products
 const productSchema = new mongoose.Schema({
@@ -124,7 +81,7 @@ const productSchema = new mongoose.Schema({
 // Create a model based on the product schema
 const Product = mongoose.model("Product", productSchema);
 
-//Creating API for adding Products
+
 app.post('/addproduct', async (req, res) => {
     try {
         // Fetch all products from the database
@@ -155,8 +112,10 @@ app.post('/addproduct', async (req, res) => {
             old_price: req.body.old_price,
         });
 
+        console.log(product);
         // Save the product to the database
         await product.save();
+        console.log("Saved");
 
         res.status(201).json({
             success: true,
@@ -172,6 +131,7 @@ app.post('/addproduct', async (req, res) => {
 });
 
 //Creating API for deleting Products
+
 app.post('/removeproduct', async (req, res) => {
     try {
         // Find and delete the product with the specified ID
@@ -193,6 +153,7 @@ app.post('/removeproduct', async (req, res) => {
 });
 
 // Creating API for getting all products
+
 app.get('/allproducts', async (req, res) => {
     try {
         // Fetch all products from the database
@@ -240,18 +201,8 @@ const Users = mongoose.model("Users", userSchema);
 
 //Creating Endpoints for registering the user
 // This route handles user sign up
-const validateEmail = (email) => {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return re.test(String(email).toLowerCase());
-};
-
 app.post('/signup', async (req, res) => {
     try {
-        // Validate email
-        if (!validateEmail(req.body.email)) {
-            return res.status(400).json({ success: false, errors: "Invalid email address" });
-        }
-
         // Check if the user with the provided email already exists
         let check = await Users.findOne({ email: req.body.email });
 
@@ -293,7 +244,6 @@ app.post('/signup', async (req, res) => {
         res.status(500).json({ success: false, errors: "Internal server error" });
     }
 });
-
 
 
 // Creating endpoint for user login
@@ -472,10 +422,6 @@ app.post('/getcart', fetchUser, async (req, res) => {
     }
 });
 
-// Route handler for the root path
-app.get("/", (req, res) => {
-    res.send("Server is running.");
-});
 
 
 app.listen(port, (error) => {
