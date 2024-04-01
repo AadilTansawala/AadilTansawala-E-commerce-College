@@ -6,6 +6,7 @@ const jwt = require("jsonwebtoken");
 const multer = require("multer");
 const path = require("path");
 const cors = require("cors");
+const os = require('os');
 
 app.use(express.json());
 
@@ -30,9 +31,9 @@ const connectWithRetry = () => {
 connectWithRetry();
 
 
-// Set up multer storage engine
+// Set up multer storage engine with a temporary directory
 const storage = multer.diskStorage({
-    destination: './public/images', // Destination folder for storing uploaded images
+    destination: os.tmpdir(), // Use the temporary directory provided by the operating system
     filename: (req, file, cb) => {
         cb(null, `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`);
     }
@@ -41,8 +42,8 @@ const storage = multer.diskStorage({
 // Use disk storage for file uploads
 const upload = multer({ storage: storage });
 
-// Serve static files (images) from the 'public/images' directory
-app.use('/images', express.static('public/images'));
+// Serve static files (images) from the temporary directory
+app.use('/images', express.static(os.tmpdir()));
 
 // Route for handling file uploads
 app.post("/upload", upload.single('product'), (req, res) => {
@@ -61,6 +62,7 @@ app.post("/upload", upload.single('product'), (req, res) => {
         res.status(400).json({ success: 0, error: "File upload failed" });
     }
 });
+
 
 
 
