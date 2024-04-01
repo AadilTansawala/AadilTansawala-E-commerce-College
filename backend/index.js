@@ -11,7 +11,11 @@ const os = require('os');
 
 app.use(express.json());
 
-// CORS configuration for all endpoints
+// Enable CORS for all routes
+app.use(cors());
+
+// Add your routes here
+// For example:
 app.options(['/allproducts', '/removeproduct', '/upload', '/addproduct', '/images'], cors());
 
 
