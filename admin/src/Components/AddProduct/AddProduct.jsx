@@ -39,6 +39,9 @@ const AddProduct = () => {
         formData.append('old_price', old_price);
         formData.append('image', image);
     
+        // Log the Content-Type header
+        console.log("Content-Type:", formData.getHeaders()['content-type']);
+    
         try {
             const response = await fetch('https://aadiltansawala-e-commerce-college-api.onrender.com/addproduct', {
                 method: 'POST',
@@ -56,6 +59,7 @@ const AddProduct = () => {
             alert("An error occurred while adding the product.");
         }
     };
+    
 
     return (
         <div className="add-product">
