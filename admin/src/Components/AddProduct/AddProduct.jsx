@@ -17,9 +17,6 @@ const AddProduct = () => {
     };
 
     const changeHandler = (e) => {
-        // Log the input field name and value
-        console.log("Input field name:", e.target.name);
-        console.log("Input field value:", e.target.value);
     
         // Update the productDetails state when other input fields change
         setProductDetails({ ...productDetails, [e.target.name]: e.target.value });
