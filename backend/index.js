@@ -42,11 +42,12 @@ const storage = multer.memoryStorage(); // Use memory storage to store files in 
 const upload = multer({ storage: storage });
 
 // Creating Upload Endpoint for images
+// Route for handling file uploads
 app.post("/upload", upload.single('product'), async (req, res) => {
     try {
         // Read the uploaded image file
         const image = {
-            data: req.file.buffer, // Store the file buffer directly
+            data: fs.readFileSync(req.file.path),
             contentType: req.file.mimetype
         };
 
@@ -74,6 +75,7 @@ app.post("/upload", upload.single('product'), async (req, res) => {
         res.status(500).json({ success: false, error: "An error occurred while uploading image and adding product" });
     }
 });
+
 
 // Serve images from the database
 app.get('/images/:productId', async (req, res) => {
