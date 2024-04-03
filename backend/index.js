@@ -16,10 +16,10 @@ app.use(cors());
 
 // Add your routes here
 // For example:
-app.options(['/allproducts', '/removeproduct', '/upload', '/addproduct', '/images'], cors());
+app.options(['/allproducts', '/removeproduct', '/upload', '/addproduct', '/images' ,'/images/:productId'], cors());
 
 
-// Database Connection with MongoDB
+// Database Connection with MongoDB0
 
 const connectWithRetry = () => {
     mongoose.connect('mongodb+srv://aadil:07070707@cluster0.x4wrsel.mongodb.net/E-COMMERCE', { useNewUrlParser: true, useUnifiedTopology: true })
@@ -37,27 +37,67 @@ connectWithRetry();
 
 
 // Image Storage Engine
-const storage = multer.diskStorage({
-    destination: './upload/images',
-    filename: (req, file, cb) => {
-        cb(null, `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`);
-    }
-});
+const storage = multer.memoryStorage(); // Use memory storage to store files in memory instead of the file system
 
 const upload = multer({ storage: storage });
 
-// Creating Upload Endpoints for images
-// Serve static files (images) from the 'upload/images' directory
-app.use('/images', express.static('upload/images'));
+// Creating Upload Endpoint for images
+app.post("/upload", upload.single('product'), async (req, res) => {
+    try {
+        // Read the uploaded image file
+        const image = {
+            data: req.file.buffer, // Store the file buffer directly
+            contentType: req.file.mimetype
+        };
 
-// Route for handling file uploads
-app.post("/upload", upload.single('product'), (req, res) => {
-    // If file upload is successful, return a JSON response with success status and image URL
-    res.json({
-        success: 1,
-        imageUrl: `https://${req.hostname}/images/${req.file.filename}`
-    });
+        // Create a new product instance with image data
+        const product = new Product({
+            name: req.body.name,
+            image: image,
+            category: req.body.category,
+            new_price: req.body.new_price,
+            old_price: req.body.old_price,
+        });
+
+        // Save the product to the database
+        await product.save();
+
+        // If file upload is successful, return a JSON response with success status and image URL
+        res.json({
+            success: true,
+            message: "Image uploaded and product added successfully",
+            imageUrl: `https://${req.hostname}/images/${product.id}` // Use product ID as image URL
+        });
+    } catch (error) {
+        // If an error occurs, handle it and send an error response
+        console.error("Error uploading image and adding product:", error);
+        res.status(500).json({ success: false, error: "An error occurred while uploading image and adding product" });
+    }
 });
+
+// Serve images from the database
+app.get('/images/:productId', async (req, res) => {
+    try {
+        // Fetch the product by ID from the database
+        const product = await Product.findById(req.params.productId);
+
+        // If product not found or image data missing, send 404 Not Found
+        if (!product || !product.image) {
+            return res.status(404).send('Image not found');
+        }
+
+        // Set appropriate content type for the image
+        res.contentType(product.image.contentType);
+
+        // Send the image data
+        res.send(product.image.data);
+    } catch (error) {
+        // If an error occurs, handle it and send an error response
+        console.error("Error fetching image:", error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
 
 
 
@@ -70,7 +110,7 @@ app.use((err, req, res, next) => {
 });
 
 
-// Schema for Creating Products
+// Schema for Creating Products with image data
 const productSchema = new mongoose.Schema({
     id: {
         type: Number,
@@ -81,8 +121,8 @@ const productSchema = new mongoose.Schema({
         required: true,
     },
     image: {
-        type: String,
-        required: true,
+        data: Buffer, // Store image data as a Buffer
+        contentType: String, // Store image content type
     },
     category: {
         type: String,
