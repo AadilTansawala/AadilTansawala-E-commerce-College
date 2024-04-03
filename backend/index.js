@@ -131,13 +131,14 @@ app.use((err, req, res, next) => {
 
 // Schema for Creating Products with image data
 const productSchema = new mongoose.Schema({
+    // Remove the 'id' field from the schema
     name: {
         type: String,
         required: true,
     },
     image: {
-        data: Buffer, // Store image data as a Buffer
-        contentType: String, // Store image content type
+        type: String,
+        required: true,
     },
     category: {
         type: String,
@@ -164,6 +165,7 @@ const productSchema = new mongoose.Schema({
 
 // Create a model based on the product schema
 const Product = mongoose.model("Product", productSchema);
+
 
 //Creating API for adding Products
 app.post('/addproduct', async (req, res) => {
