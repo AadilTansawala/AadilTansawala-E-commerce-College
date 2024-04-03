@@ -137,7 +137,8 @@ const productSchema = new mongoose.Schema({
         required: true,
     },
     image: {
-        type: String,
+        data: Buffer, // Store image data as a Buffer
+        contentType: String, // Store image content type
         required: true,
     },
     category: {
