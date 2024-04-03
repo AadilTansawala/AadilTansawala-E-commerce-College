@@ -183,21 +183,7 @@ const Product = mongoose.model("Product", productSchema);
 app.post('/addproduct', async (req, res) => {
     try {
         console.log(req.body);
-        const { name, category, new_price, old_price } = req.body;
-
-        // Get the image data from the request body
-        const image = req.file.buffer;
-
-        // Create a new product instance using the Product model
-        const product = new Product({
-            name: name,
-            category: category,
-            new_price: new_price,
-            old_price: old_price,
-            image: image // Store the image buffer in the database
-        });
-
-        console.log(product);
+        
 
     } catch (error) {
         // If an error occurs, handle it and send an error response
