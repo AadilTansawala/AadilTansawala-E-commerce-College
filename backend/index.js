@@ -52,25 +52,38 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
+// Read the uploaded image file asynchronously using fs.readFile
+const readImageFile = (filePath) => {
+    return new Promise((resolve, reject) => {
+        fs.readFile(filePath, (err, data) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(data);
+            }
+        });
+    });
+};
+
 // Route for handling file uploads and adding products
-app.post("/upload", upload.single('image'), async (req, res) => {
+app.post("/upload", upload.single('product'), async (req, res) => {
     try {
         // Validate the request body to ensure all required fields are present
         const { name, category, new_price, old_price } = req.body;
-        if (!name || !category || !new_price || !old_price || !req.file) {
-            return res.status(400).json({ success: false, error: "Missing required fields or image" });
+        if (!name || !category || !new_price || !old_price) {
+            return res.status(400).json({ success: false, error: "Missing required fields" });
         }
 
-        // Read the uploaded image file
-        const image = {
-            data: fs.readFileSync(req.file.path),
-            contentType: req.file.mimetype
-        };
+        // Read the uploaded image file asynchronously
+        const imageData = await readImageFile(req.file.path);
 
         // Create a new product instance with image data
         const product = new Product({
             name: name,
-            image: image,
+            image: {
+                data: imageData,
+                contentType: req.file.mimetype
+            },
             category: category,
             new_price: new_price,
             old_price: old_price,
@@ -83,7 +96,7 @@ app.post("/upload", upload.single('image'), async (req, res) => {
         res.json({
             success: true,
             message: "Image uploaded and product added successfully",
-            imageUrl: `https://${req.hostname}/images/${product._id}` // Use product ID as image URL
+            imageUrl: `https://${req.hostname}/images/${product.id}` // Use product ID as image URL
         });
     } catch (error) {
         // If an error occurs, handle it and send an error response
@@ -91,6 +104,7 @@ app.post("/upload", upload.single('image'), async (req, res) => {
         res.status(500).json({ success: false, error: "An error occurred while uploading image and adding product" });
     }
 });
+
 
 
 
@@ -143,8 +157,14 @@ const productSchema = new mongoose.Schema({
         required: true,
     },
     image: {
-        data: Buffer, // Store image data as a Buffer
-        contentType: String, // Store image content type
+        data: {
+            type: Buffer, // Store image data as a Buffer
+            required: true,
+        },
+        contentType: {
+            type: String, // Store image content type
+            required: true,
+        },
     },
     category: {
         type: String,
@@ -268,13 +288,7 @@ app.get('/allproducts', async (req, res) => {
         // Log a message to indicate that all products have been fetched
         console.log("All Products Fetched");
 
-        // Map each product to include image URL
-        products = products.map(product => ({
-            ...product.toJSON(),
-            imageUrl: `https://${req.hostname}/images/${product.id}`
-        }));
-
-        // Send the fetched products with image URLs as a response
+        // Send the fetched products as a response
         res.json(products);
     } catch (error) {
         // If an error occurs, handle it and send an error response
