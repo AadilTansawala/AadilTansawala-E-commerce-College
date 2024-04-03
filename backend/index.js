@@ -37,7 +37,7 @@ app.post("/upload", upload.single('product'), (req, res) => {
     // If file upload is successful, return a JSON response with success status and image URL
     res.json({
         success: 1,
-        imageUrl: `http://${req.hostname}:${port}/images/${req.file.filename}`
+        imageUrl: `https://${req.hostname}/images/${req.file.filename}`
     });
 });
 
