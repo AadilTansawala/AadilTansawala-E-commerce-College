@@ -182,6 +182,7 @@ const Product = mongoose.model("Product", productSchema);
 // Creating API for adding Products
 app.post('/addproduct', async (req, res) => {
     try {
+        console.log(req.body);
         const { name, category, new_price, old_price } = req.body;
 
         // Get the image data from the request body
