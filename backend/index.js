@@ -66,7 +66,7 @@ const readImageFile = (filePath) => {
 };
 
 // Route for handling file uploads and adding products
-app.post("/upload", upload.single('product'), async (req, res) => {
+app.post("/upload", upload.single('image'), async (req, res) => {
     try {
         // Validate the request body to ensure all required fields are present
         const { name, category, new_price, old_price } = req.body;
