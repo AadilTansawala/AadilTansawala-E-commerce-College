@@ -131,10 +131,6 @@ app.use((err, req, res, next) => {
 
 // Schema for Creating Products with image data
 const productSchema = new mongoose.Schema({
-    id: {
-        type: Number,
-        required: true,
-    },
     name: {
         type: String,
         required: true,
