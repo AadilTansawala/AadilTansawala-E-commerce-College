@@ -12,9 +12,24 @@ const AddProduct = () => {
     });
 
     const imageHandler = (e) => {
-        // Set the selected image file to the state
-        setImage(e.target.files[0]);
+    // Get the selected image file
+    const selectedImage = e.target.files[0];
+
+    // Create a new FileReader instance
+    const reader = new FileReader();
+
+    // Define a function to handle the onload event of the FileReader
+    reader.onload = function(event) {
+        // Read the binary data of the image file
+        const imageData = event.target.result;
+        
+        // Set the image data to the state
+        setImage(imageData);
     };
+
+    // Read the contents of the image file as binary data
+    reader.readAsBinaryString(selectedImage);
+};
 
     const changeHandler = (e) => {
     
