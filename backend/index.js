@@ -268,7 +268,13 @@ app.get('/allproducts', async (req, res) => {
         // Log a message to indicate that all products have been fetched
         console.log("All Products Fetched");
 
-        // Send the fetched products as a response
+        // Map each product to include image URL
+        products = products.map(product => ({
+            ...product.toJSON(),
+            imageUrl: `https://${req.hostname}/images/${product.id}`
+        }));
+
+        // Send the fetched products with image URLs as a response
         res.json(products);
     } catch (error) {
         // If an error occurs, handle it and send an error response
