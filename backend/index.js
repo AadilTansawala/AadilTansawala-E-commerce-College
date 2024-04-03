@@ -38,8 +38,16 @@ const connectWithRetry = () => {
 connectWithRetry();
 
 
+// Define the destination directory for storing uploaded images
+const uploadDir = path.join(__dirname, 'upload/images');
+
 // Image Storage Engine
-const storage = multer.memoryStorage(); // Use memory storage to store files in memory instead of the file system
+const storage = multer.diskStorage({
+    destination: uploadDir,
+    filename: (req, file, cb) => {
+        cb(null, `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`);
+    }
+});
 
 const upload = multer({ storage: storage });
 
