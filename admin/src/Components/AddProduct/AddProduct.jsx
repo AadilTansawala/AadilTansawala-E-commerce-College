@@ -51,7 +51,7 @@ const AddProduct = () => {
             productDetails.category,
             productDetails.new_price,
             productDetails.old_price,
-            image
+            image.data
         );
         try {
             const response = await fetch('https://aadiltansawala-e-commerce-college-api.onrender.com/upload', {
