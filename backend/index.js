@@ -179,12 +179,21 @@ const Product = mongoose.model("Product", productSchema);
 
 
 //Creating API for adding Products
-app.post('/addproduct', async (req, res) => {
+// Creating API for adding Products
+app.post('/addproduct', upload.single('image'), async (req, res) => {
     try {
         const { name, category, new_price, old_price } = req.body;
 
-        // Get the image data from the request body
-        const image = req.file.buffer;
+        // Check if a file was uploaded
+        if (!req.file) {
+            return res.status(400).json({ success: false, error: "No file uploaded" });
+        }
+
+        // Read the uploaded image file
+        const image = {
+            data: req.file.buffer,
+            contentType: req.file.mimetype
+        };
 
         // Create a new product instance using the Product model
         const product = new Product({
@@ -210,6 +219,7 @@ app.post('/addproduct', async (req, res) => {
         res.status(500).json({ success: false, error: "An error occurred while adding the product" });
     }
 });
+
 
 
 //Creating API for deleting Products
