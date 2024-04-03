@@ -137,6 +137,7 @@ const productSchema = new mongoose.Schema({
         type: Number,
         required: true,
     },
+    
     name: {
         type: String,
         required: true,
@@ -184,6 +185,24 @@ const Product = mongoose.model("Product", productSchema);
 // Creating API for adding Products
 app.post('/addproduct', upload.single('image'), async (req, res) => {
     try {
+        // Fetch all products from the database
+        let products = await Product.find({});
+
+        // Initialize a variable to hold the new ID
+        let id;
+
+        // Check if there are existing products
+        if (products.length > 0) {
+            // Get the last product from the array
+            let lastProduct = products[products.length - 1];
+
+            // Increment the last product's ID by one to generate a new ID
+            id = lastProduct.id + 1;
+        } else {
+            // If there are no existing products, start with ID 1
+            id = 1;
+        }
+
         const { name, category, new_price, old_price } = req.body;
 
         // Check if a file was uploaded
@@ -199,6 +218,7 @@ app.post('/addproduct', upload.single('image'), async (req, res) => {
 
         // Create a new product instance using the Product model
         const product = new Product({
+            id: id,
             name: name,
             category: category,
             new_price: new_price,
