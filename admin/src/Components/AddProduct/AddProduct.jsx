@@ -79,7 +79,7 @@ const AddProduct = () => {
         <div className="add-product">
             <div className="add-product-itemField">
                 <p>Product Title</p>
-                <input value={productDetails.name} onChange={(e) => console.log(e.target.value)} type="text" name="name" placeholder="Type Here.." />
+                <input value={productDetails.name} onChange={(e) => changeHandler(e)} type="text" name="name" placeholder="Type Here.." />
 
             </div>
 
