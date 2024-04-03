@@ -24,26 +24,31 @@ const AddProduct = () => {
             alert("Please select an image.");
             return;
         }
-
+    
+        const { name, category, new_price, old_price } = productDetails;
+    
+        if (!name || !new_price || !old_price) {
+            alert("Please fill in all required fields.");
+            return;
+        }
+    
         const formData = new FormData();
         formData.append('product', image);
-        formData.append('name', productDetails.name);
-        formData.append('category', productDetails.category);
-        formData.append('new_price', productDetails.new_price);
-        formData.append('old_price', productDetails.old_price);
-
+        formData.append('name', name);
+        formData.append('category', category);
+        formData.append('new_price', new_price);
+        formData.append('old_price', old_price);
+    
         try {
             const uploadResponse = await fetch('https://aadiltansawala-e-commerce-college-api.onrender.com/upload', {
                 method: 'POST',
                 body: formData,
             });
             const uploadData = await uploadResponse.json();
-
+    
             if (uploadData.success) {
-                // Update productDetails with the image URL
-                const product = { ...productDetails, image: uploadData.imageUrl };
-
-                // Send a POST request to add the product
+                const product = { name, category, new_price, old_price, image: uploadData.imageUrl };
+    
                 const addProductResponse = await fetch('https://aadiltansawala-e-commerce-college-api.onrender.com/addproduct', {
                     method: 'POST',
                     headers: {
@@ -52,8 +57,7 @@ const AddProduct = () => {
                     body: JSON.stringify(product),
                 });
                 const addProductData = await addProductResponse.json();
-
-                // Display success or failure message based on response
+    
                 addProductData.success ? alert("Product Added") : alert("Failed to add product.");
             } else {
                 alert("Failed to upload image.");
@@ -63,6 +67,7 @@ const AddProduct = () => {
             alert("An error occurred while adding the product.");
         }
     };
+    
 
     return (
         <div className="add-product">
