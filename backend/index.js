@@ -6,21 +6,45 @@ const jwt = require("jsonwebtoken");
 const multer = require("multer");
 const path = require("path");
 const cors = require("cors");
+const os = require('os');
+const fs = require('fs');
+
+
 
 app.use(express.json());
+
+// Enable CORS for all routes
 app.use(cors());
 
-// Database Connection with MongoDB
-mongoose.connect("mongodb+srv://aadil:07070707@cluster0.x4wrsel.mongodb.net/E-COMMERCE");
+// Add your routes here
+// For example:
+app.options(['/allproducts', '/removeproduct', '/upload', '/addproduct', '/images' ,'/images/:productId'], cors());
 
-// API Creation
-app.get("/", (req, res) => {
-    res.send("Express app is Running ");
-});
+
+// Database Connection with MongoDB0
+
+const connectWithRetry = () => {
+    mongoose.connect('mongodb+srv://aadil:07070707@cluster0.x4wrsel.mongodb.net/E-COMMERCE', { useNewUrlParser: true, useUnifiedTopology: true })
+        .then(() => {
+            console.log('Connected to MongoDB Atlas');
+        })
+        .catch((err) => {
+            console.error('Failed to connect to MongoDB Atlas:', err.message);
+            console.log('Retrying connection in 5 seconds...');
+            setTimeout(connectWithRetry, 5000); // Retry after 5 seconds
+        });
+};
+
+connectWithRetry();
+
+
+// Define the destination directory for storing uploaded images
+const uploadDir = path.join(__dirname, 'upload/images');
+console.log("Destination directory:", uploadDir); // Add this line to log the destination directory
 
 // Image Storage Engine
 const storage = multer.diskStorage({
-    destination: './upload/images',
+    destination: uploadDir,
     filename: (req, file, cb) => {
         cb(null, `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`);
     }
@@ -28,32 +52,105 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-// Creating Upload Endpoints for images
-// Serve static files (images) from the 'upload/images' directory
-app.use('/images', express.static('upload/images'));
+// Route for handling file uploads and adding products
+app.post("/upload", upload.single('image'), async (req, res) => {
+    try {
+        // Validate the request body to ensure all required fields are present
+        const { name, category, new_price, old_price } = req.body;
+        if (!name || !category || !new_price || !old_price || !req.file) {
+            return res.status(400).json({ success: false, error: "Missing required fields or image" });
+        }
 
-// Route for handling file uploads
-app.post("/upload", upload.single('product'), (req, res) => {
-    // If file upload is successful, return a JSON response with success status and image URL
-    res.json({
-        success: 1,
-        imageUrl: `https://${req.hostname}/images/${req.file.filename}`
-    });
+        // Read the uploaded image file
+        const image = {
+            data: fs.readFileSync(req.file.path),
+            contentType: req.file.mimetype
+        };
+
+        // Create a new product instance with image data
+        const product = new Product({
+            name: name,
+            image: image,
+            category: category,
+            new_price: new_price,
+            old_price: old_price,
+        });
+
+        // Save the product to the database
+        await product.save();
+
+        // If file upload is successful, return a JSON response with success status and image URL
+        res.json({
+            success: true,
+            message: "Image uploaded and product added successfully",
+            imageUrl: `https://${req.hostname}/images/${product._id}` // Use product ID as image URL
+        });
+    } catch (error) {
+        // If an error occurs, handle it and send an error response
+        console.error("Error uploading image and adding product:", error);
+        res.status(500).json({ success: false, error: "An error occurred while uploading image and adding product" });
+    }
 });
 
-// Schema for Creating Products
+
+
+
+
+// Serve images from the database
+app.get('/images/:productId', async (req, res) => {
+    try {
+        // Fetch the product by ID from the database
+        const product = await Product.findById(req.params.productId);
+
+        // If product not found or image data missing, send 404 Not Found
+        if (!product || !product.image) {
+            return res.status(404).send('Image not found');
+        }
+
+        // Set appropriate content type for the image
+        res.contentType(product.image.contentType);
+
+        // Send the image data
+        res.send(product.image.data);
+    } catch (error) {
+        // If an error occurs, handle it and send an error response
+        console.error("Error fetching image:", error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+
+
+
+
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).send('Something went wrong!');
+});
+
+
+// Schema for Creating Products with image data
 const productSchema = new mongoose.Schema({
     id: {
         type: Number,
         required: true,
     },
+    
     name: {
         type: String,
         required: true,
     },
     image: {
-        type: String,
-        required: true,
+        data: {
+            type: Buffer, // Store image data as a Buffer
+            required: true,
+        },
+        contentType: {
+            type: String, // Store image content type
+            required: true,
+        },
     },
     category: {
         type: String,
@@ -78,11 +175,15 @@ const productSchema = new mongoose.Schema({
     // Add other properties of the product schema here
 });
 
+
+
 // Create a model based on the product schema
 const Product = mongoose.model("Product", productSchema);
 
 
-app.post('/addproduct', async (req, res) => {
+//Creating API for adding Products
+// Creating API for adding Products
+app.post('/addproduct', upload.single('image'), async (req, res) => {
     try {
         // Fetch all products from the database
         let products = await Product.find({});
@@ -102,25 +203,36 @@ app.post('/addproduct', async (req, res) => {
             id = 1;
         }
 
+        const { name, category, new_price, old_price } = req.body;
+
+        // Check if a file was uploaded
+        if (!req.file) {
+            return res.status(400).json({ success: false, error: "No file uploaded" });
+        }
+
+        // Read the uploaded image file
+        const image = {
+            data: req.file.buffer,
+            contentType: req.file.mimetype
+        };
+
         // Create a new product instance using the Product model
         const product = new Product({
             id: id,
-            name: req.body.name,
-            image: req.body.image,
-            category: req.body.category,
-            new_price: req.body.new_price,
-            old_price: req.body.old_price,
+            name: name,
+            category: category,
+            new_price: new_price,
+            old_price: old_price,
+            image: image // Store the image buffer in the database
         });
 
-        console.log(product);
         // Save the product to the database
         await product.save();
-        console.log("Saved");
 
         res.status(201).json({
             success: true,
             message: "Product added successfully",
-            name: req.body.name,
+            name: name,
         });
 
     } catch (error) {
@@ -130,8 +242,9 @@ app.post('/addproduct', async (req, res) => {
     }
 });
 
-//Creating API for deleting Products
 
+
+//Creating API for deleting Products
 app.post('/removeproduct', async (req, res) => {
     try {
         // Find and delete the product with the specified ID
@@ -153,7 +266,6 @@ app.post('/removeproduct', async (req, res) => {
 });
 
 // Creating API for getting all products
-
 app.get('/allproducts', async (req, res) => {
     try {
         // Fetch all products from the database
@@ -201,8 +313,18 @@ const Users = mongoose.model("Users", userSchema);
 
 //Creating Endpoints for registering the user
 // This route handles user sign up
+const validateEmail = (email) => {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(String(email).toLowerCase());
+};
+
 app.post('/signup', async (req, res) => {
     try {
+        // Validate email
+        if (!validateEmail(req.body.email)) {
+            return res.status(400).json({ success: false, errors: "Invalid email address" });
+        }
+
         // Check if the user with the provided email already exists
         let check = await Users.findOne({ email: req.body.email });
 
@@ -244,6 +366,7 @@ app.post('/signup', async (req, res) => {
         res.status(500).json({ success: false, errors: "Internal server error" });
     }
 });
+
 
 
 // Creating endpoint for user login
@@ -422,6 +545,10 @@ app.post('/getcart', fetchUser, async (req, res) => {
     }
 });
 
+// Route handler for the root path
+app.get("/", (req, res) => {
+    res.send("Server is running.");
+});
 
 
 app.listen(port, (error) => {

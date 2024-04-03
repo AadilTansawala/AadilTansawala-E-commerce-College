@@ -3,70 +3,75 @@ import "./AddProduct.css";
 import upload_area from "../../Assets/upload_area.svg";
 
 const AddProduct = () => {
-    const [image, setImage] = useState(null); // Initialize image state with null
+    const [image, setImage] = useState(null);
     const [productDetails, setProductDetails] = useState({
         name: "",
-        image: "", // Initialize image property with an empty string
         category: "men",
         new_price: "",
         old_price: ""
     });
 
     const imageHandler = (e) => {
+        // Set the selected image file to the state
         setImage(e.target.files[0]);
-        console.log(image);// Update image state with the selected file
     };
 
     const changeHandler = (e) => {
+    
+        // Update the productDetails state when other input fields change
         setProductDetails({ ...productDetails, [e.target.name]: e.target.value });
+    
+        // Log the updated productDetails state
+        console.log("Updated product details:", productDetails);
     };
+    
 
     const Add_Product = async () => {
-        console.log(productDetails); // Logging before state update
-
-        let responseData;
-
-        let product = productDetails;
-        let formData = new FormData();
-        formData.append('product', image);
-
+        if (image) {
+            alert("Please select an image.");
+            return;
+        }
+    
+        const { name, category, new_price, old_price } = productDetails;
+    
+        if (!name || !new_price || !old_price) {
+            alert("Please fill in all required fields.");
+            return;
+        }
+    
+        const formData = new FormData();
+        formData.append('name', name);
+        formData.append('category', category);
+        formData.append('new_price', new_price);
+        formData.append('old_price', old_price);
+        formData.append('image', image); // Append the image file to the FormData object
+    
+        console.log(
+            productDetails.name,
+            productDetails.category,
+            productDetails.new_price,
+            productDetails.old_price,
+            image.data
+        );
         try {
-            await fetch('https://e-commerce-college-api.vercel.app/upload', {
+            const response = await fetch('https://aadiltansawala-e-commerce-college-api.onrender.com/upload', {
                 method: 'POST',
-                headers: {
-                    Accept: 'application/json',
-                },
                 body: formData,
-            }).then((resp) => resp.json()).then((data) => { responseData = data })
-
-            if (responseData.success) {
-                // Update productDetails with the image URL
-                product.image = responseData.imageUrl;
-                console.log(product);
-                // Send a POST request to add the product
-                const addProductResponse = await fetch('https://e-commerce-college-api.vercel.app/addproduct', {
-                    method: 'POST',
-                    headers: {
-                        Accept: 'application/json',
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(product),
-                });
-
-                // Parse the response JSON data for adding the product
-                const addProductData = await addProductResponse.json();
-
-                // Display success or failure message based on response
-                addProductData.success ? alert("Product Added") : alert("Failed");
+            });
+            const data = await response.json();
+    
+            if (data.success) {
+                alert("Product Added");
             } else {
-                alert("Failed to upload image");
+                alert("Failed to add product.");
             }
         } catch (error) {
             console.error('Error adding product:', error);
+            alert("An error occurred while adding the product.");
         }
     };
-
-
+    
+    
 
     return (
         <div className="add-product">
@@ -95,14 +100,15 @@ const AddProduct = () => {
                 </select>
             </div>
 
-            <div className="add-product-itemField">
+             {/* Input field for selecting image */}
+             <div className="add-product-itemField">
                 <label htmlFor="file-input">
                     <img src={image ? URL.createObjectURL(image) : upload_area} className="add-product-thumbnail-img" alt="" />
                 </label>
                 <input onChange={imageHandler} type="file" name="image" id="file-input" hidden />
             </div>
-
-            <button onClick={() => { Add_Product() }} className="add-product-button">
+            {/* Button to add product */}
+            <button onClick={Add_Product} className="add-product-button">
                 ADD
             </button>
         </div>
