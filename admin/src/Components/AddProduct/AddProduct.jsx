@@ -41,7 +41,7 @@ const AddProduct = () => {
         formData.append('old_price', old_price);
         formData.append('image', image); // Append the image file to the FormData object
 
-        console.log(formData);
+        console.log(formData.name, formData.category,formData.new_price,formData.old_price,formData.image );
         try {
             const response = await fetch('https://aadiltansawala-e-commerce-college-api.onrender.com/addproduct', {
                 method: 'POST',
