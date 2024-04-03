@@ -41,10 +41,15 @@ const storage = multer.memoryStorage(); // Use memory storage to store files in 
 
 const upload = multer({ storage: storage });
 
-// Creating Upload Endpoint for images
-// Route for handling file uploads
+// Route for handling file uploads and adding products
 app.post("/upload", upload.single('product'), async (req, res) => {
     try {
+        // Validate the request body to ensure all required fields are present
+        const { name, category, new_price, old_price } = req.body;
+        if (!name || !category || !new_price || !old_price) {
+            return res.status(400).json({ success: false, error: "Missing required fields" });
+        }
+
         // Read the uploaded image file
         const image = {
             data: fs.readFileSync(req.file.path),
@@ -53,11 +58,11 @@ app.post("/upload", upload.single('product'), async (req, res) => {
 
         // Create a new product instance with image data
         const product = new Product({
-            name: req.body.name,
+            name: name,
             image: image,
-            category: req.body.category,
-            new_price: req.body.new_price,
-            old_price: req.body.old_price,
+            category: category,
+            new_price: new_price,
+            old_price: old_price,
         });
 
         // Save the product to the database
@@ -75,6 +80,7 @@ app.post("/upload", upload.single('product'), async (req, res) => {
         res.status(500).json({ success: false, error: "An error occurred while uploading image and adding product" });
     }
 });
+
 
 
 // Serve images from the database
