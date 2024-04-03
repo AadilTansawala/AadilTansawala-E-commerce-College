@@ -33,42 +33,29 @@ const AddProduct = () => {
         }
     
         const formData = new FormData();
-        formData.append('product', image);
         formData.append('name', name);
         formData.append('category', category);
         formData.append('new_price', new_price);
         formData.append('old_price', old_price);
+        formData.append('image', image);
     
         try {
-            const uploadResponse = await fetch('https://aadiltansawala-e-commerce-college-api.onrender.com/upload', {
+            const response = await fetch('https://aadiltansawala-e-commerce-college-api.onrender.com/addproduct', {
                 method: 'POST',
                 body: formData,
             });
-            const uploadData = await uploadResponse.json();
+            const data = await response.json();
     
-            if (uploadData.success) {
-                const product = { name, category, new_price, old_price, image: uploadData.imageUrl };
-    
-                const addProductResponse = await fetch('https://aadiltansawala-e-commerce-college-api.onrender.com/addproduct', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(product),
-                });
-                const addProductData = await addProductResponse.json();
-    
-                addProductData.success ? alert("Product Added") : alert("Failed to add product.");
+            if (data.success) {
+                alert("Product Added");
             } else {
-                alert("Failed to upload image.");
+                alert("Failed to add product.");
             }
         } catch (error) {
             console.error('Error adding product:', error);
             alert("An error occurred while adding the product.");
         }
     };
-
-    
 
     return (
         <div className="add-product">

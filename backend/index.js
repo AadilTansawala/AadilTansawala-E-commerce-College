@@ -38,10 +38,6 @@ const connectWithRetry = () => {
 connectWithRetry();
 
 
-// Define the destination directory for storing uploaded images
-const uploadDir = path.join(__dirname, 'upload/images');
-console.log("Destination directory:", uploadDir); // Add this line to log the destination directory
-
 // Image Storage Engine
 const storage = multer.diskStorage({
     destination: uploadDir,
@@ -55,6 +51,11 @@ const upload = multer({ storage: storage });
 // Route for handling file uploads and adding products
 app.post("/upload", upload.single('product'), async (req, res) => {
     try {
+        // Validate the uploaded file
+        if (!req.file || !req.file.mimetype.startsWith('image')) {
+            return res.status(400).json({ success: false, error: "Invalid file format" });
+        }
+
         // Validate the request body to ensure all required fields are present
         const { name, category, new_price, old_price } = req.body;
         if (!name || !category || !new_price || !old_price) {
@@ -181,32 +182,18 @@ const Product = mongoose.model("Product", productSchema);
 //Creating API for adding Products
 app.post('/addproduct', async (req, res) => {
     try {
-        // Fetch all products from the database
-        let products = await Product.find({});
+        const { name, category, new_price, old_price } = req.body;
 
-        // Initialize a variable to hold the new ID
-        let id;
-
-        // Check if there are existing products
-        if (products.length > 0) {
-            // Get the last product from the array
-            let lastProduct = products[products.length - 1];
-
-            // Increment the last product's ID by one to generate a new ID
-            id = lastProduct.id + 1;
-        } else {
-            // If there are no existing products, start with ID 1
-            id = 1;
-        }
+        // Get the image data from the request body
+        const image = req.file.buffer;
 
         // Create a new product instance using the Product model
         const product = new Product({
-            id: id,
-            name: req.body.name,
-            image: req.body.image,
-            category: req.body.category,
-            new_price: req.body.new_price,
-            old_price: req.body.old_price,
+            name: name,
+            category: category,
+            new_price: new_price,
+            old_price: old_price,
+            image: image // Store the image buffer in the database
         });
 
         // Save the product to the database
@@ -215,7 +202,7 @@ app.post('/addproduct', async (req, res) => {
         res.status(201).json({
             success: true,
             message: "Product added successfully",
-            name: req.body.name,
+            name: name,
         });
 
     } catch (error) {
@@ -224,6 +211,7 @@ app.post('/addproduct', async (req, res) => {
         res.status(500).json({ success: false, error: "An error occurred while adding the product" });
     }
 });
+
 
 //Creating API for deleting Products
 app.post('/removeproduct', async (req, res) => {
