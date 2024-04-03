@@ -197,14 +197,7 @@ app.post('/addproduct', async (req, res) => {
             image: image // Store the image buffer in the database
         });
 
-        // Save the product to the database
-        await product.save();
-
-        res.status(201).json({
-            success: true,
-            message: "Product added successfully",
-            name: name,
-        });
+        console.log(product);
 
     } catch (error) {
         // If an error occurs, handle it and send an error response
