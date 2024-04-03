@@ -40,6 +40,7 @@ connectWithRetry();
 
 // Define the destination directory for storing uploaded images
 const uploadDir = path.join(__dirname, 'upload/images');
+console.log("Destination directory:", uploadDir); // Add this line to log the destination directory
 
 // Image Storage Engine
 const storage = multer.diskStorage({
