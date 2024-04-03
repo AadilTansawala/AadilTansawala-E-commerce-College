@@ -12,10 +12,12 @@ const AddProduct = () => {
     });
 
     const imageHandler = (e) => {
+        // Set the selected image file to the state
         setImage(e.target.files[0]);
     };
 
     const changeHandler = (e) => {
+        // Update the productDetails state when other input fields change
         setProductDetails({ ...productDetails, [e.target.name]: e.target.value });
     };
 
@@ -24,31 +26,28 @@ const AddProduct = () => {
             alert("Please select an image.");
             return;
         }
-    
+
         const { name, category, new_price, old_price } = productDetails;
-    
+
         if (!name || !new_price || !old_price) {
             alert("Please fill in all required fields.");
             return;
         }
-    
+
         const formData = new FormData();
         formData.append('name', name);
         formData.append('category', category);
         formData.append('new_price', new_price);
         formData.append('old_price', old_price);
-        formData.append('image', image);
-    
-        // Log the Content-Type header
-        console.log("Content-Type:", formData.getHeaders()['content-type']);
-    
+        formData.append('image', image); // Append the image file to the FormData object
+
         try {
             const response = await fetch('https://aadiltansawala-e-commerce-college-api.onrender.com/addproduct', {
                 method: 'POST',
                 body: formData,
             });
             const data = await response.json();
-    
+
             if (data.success) {
                 alert("Product Added");
             } else {
@@ -88,13 +87,14 @@ const AddProduct = () => {
                 </select>
             </div>
 
-            <div className="add-product-itemField">
+             {/* Input field for selecting image */}
+             <div className="add-product-itemField">
                 <label htmlFor="file-input">
                     <img src={image ? URL.createObjectURL(image) : upload_area} className="add-product-thumbnail-img" alt="" />
                 </label>
                 <input onChange={imageHandler} type="file" name="image" id="file-input" hidden />
             </div>
-
+            {/* Button to add product */}
             <button onClick={Add_Product} className="add-product-button">
                 ADD
             </button>
