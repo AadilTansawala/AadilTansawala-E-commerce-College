@@ -179,7 +179,7 @@ const productSchema = new mongoose.Schema({
 const Product = mongoose.model("Product", productSchema);
 
 
-//Creating API for adding Products
+// Creating API for adding Products
 app.post('/addproduct', async (req, res) => {
     try {
         const { name, category, new_price, old_price } = req.body;
