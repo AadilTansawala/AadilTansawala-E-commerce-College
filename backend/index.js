@@ -38,6 +38,10 @@ const connectWithRetry = () => {
 connectWithRetry();
 
 
+// Define the destination directory for storing uploaded images
+const uploadDir = path.join(__dirname, 'upload/images');
+console.log("Destination directory:", uploadDir); // Add this line to log the destination directory
+
 // Image Storage Engine
 const storage = multer.diskStorage({
     destination: uploadDir,
@@ -51,11 +55,6 @@ const upload = multer({ storage: storage });
 // Route for handling file uploads and adding products
 app.post("/upload", upload.single('product'), async (req, res) => {
     try {
-        // Validate the uploaded file
-        if (!req.file || !req.file.mimetype.startsWith('image')) {
-            return res.status(400).json({ success: false, error: "Invalid file format" });
-        }
-
         // Validate the request body to ensure all required fields are present
         const { name, category, new_price, old_price } = req.body;
         if (!name || !category || !new_price || !old_price) {
@@ -179,7 +178,7 @@ const productSchema = new mongoose.Schema({
 const Product = mongoose.model("Product", productSchema);
 
 
-// Creating API for adding Products
+//Creating API for adding Products
 app.post('/addproduct', async (req, res) => {
     try {
         const { name, category, new_price, old_price } = req.body;
