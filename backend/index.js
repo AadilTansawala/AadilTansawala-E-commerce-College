@@ -53,18 +53,12 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 // Route for handling file uploads and adding products
-// Route for handling file uploads and adding products
 app.post("/upload", upload.single('image'), async (req, res) => {
     try {
         // Validate the request body to ensure all required fields are present
         const { name, category, new_price, old_price } = req.body;
-        if (!name || !category || !new_price || !old_price) {
-            return res.status(400).json({ success: false, error: "Missing required fields" });
-        }
-
-        // Check if file is uploaded
-        if (!req.file) {
-            return res.status(400).json({ success: false, error: "No image uploaded" });
+        if (!name || !category || !new_price || !old_price || !req.file) {
+            return res.status(400).json({ success: false, error: "Missing required fields or image" });
         }
 
         // Read the uploaded image file
@@ -89,7 +83,7 @@ app.post("/upload", upload.single('image'), async (req, res) => {
         res.json({
             success: true,
             message: "Image uploaded and product added successfully",
-            imageUrl: `https://${req.hostname}/images/${product.id}` // Use product ID as image URL
+            imageUrl: `https://${req.hostname}/images/${product._id}` // Use product ID as image URL
         });
     } catch (error) {
         // If an error occurs, handle it and send an error response
@@ -97,6 +91,7 @@ app.post("/upload", upload.single('image'), async (req, res) => {
         res.status(500).json({ success: false, error: "An error occurred while uploading image and adding product" });
     }
 });
+
 
 
 
