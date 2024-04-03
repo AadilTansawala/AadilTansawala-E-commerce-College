@@ -38,10 +38,6 @@ const connectWithRetry = () => {
 connectWithRetry();
 
 
-// Define the destination directory for storing uploaded images
-const uploadDir = path.join(__dirname, 'upload/images');
-console.log("Destination directory:", uploadDir); // Log the destination directory to verify
-
 // Image Storage Engine
 const storage = multer.diskStorage({
     destination: uploadDir,
@@ -186,8 +182,28 @@ const Product = mongoose.model("Product", productSchema);
 // Creating API for adding Products
 app.post('/addproduct', async (req, res) => {
     try {
-        console.log(req.body);
-        
+        const { name, category, new_price, old_price } = req.body;
+
+        // Get the image data from the request body
+        const image = req.file.buffer;
+
+        // Create a new product instance using the Product model
+        const product = new Product({
+            name: name,
+            category: category,
+            new_price: new_price,
+            old_price: old_price,
+            image: image // Store the image buffer in the database
+        });
+
+        // Save the product to the database
+        await product.save();
+
+        res.status(201).json({
+            success: true,
+            message: "Product added successfully",
+            name: name,
+        });
 
     } catch (error) {
         // If an error occurs, handle it and send an error response
