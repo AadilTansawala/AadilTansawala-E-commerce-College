@@ -140,9 +140,14 @@ const productSchema = new mongoose.Schema({
         required: true,
     },
     image: {
-        data: Buffer, // Store image data as a Buffer
-        contentType: String, // Store image content type
-        required: true,
+        data: {
+            type: Buffer, // Store image data as a Buffer
+            required: true,
+        },
+        contentType: {
+            type: String, // Store image content type
+            required: true,
+        },
     },
     category: {
         type: String,
@@ -166,6 +171,7 @@ const productSchema = new mongoose.Schema({
     }
     // Add other properties of the product schema here
 });
+
 
 
 // Create a model based on the product schema
