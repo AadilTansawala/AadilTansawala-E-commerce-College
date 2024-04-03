@@ -3,10 +3,9 @@ import "./AddProduct.css";
 import upload_area from "../../Assets/upload_area.svg";
 
 const AddProduct = () => {
-    const [image, setImage] = useState(null); // Initialize image state with null
+    const [image, setImage] = useState(null);
     const [productDetails, setProductDetails] = useState({
         name: "",
-        image: "", // Initialize image property with an empty string
         category: "men",
         new_price: "",
         old_price: ""
@@ -14,7 +13,6 @@ const AddProduct = () => {
 
     const imageHandler = (e) => {
         setImage(e.target.files[0]);
-        console.log(image);// Update image state with the selected file
     };
 
     const changeHandler = (e) => {
@@ -22,51 +20,49 @@ const AddProduct = () => {
     };
 
     const Add_Product = async () => {
-        console.log(productDetails); // Logging before state update
+        if (!image) {
+            alert("Please select an image.");
+            return;
+        }
 
-        let responseData;
-
-        let product = productDetails;
-        let formData = new FormData();
+        const formData = new FormData();
         formData.append('product', image);
+        formData.append('name', productDetails.name);
+        formData.append('category', productDetails.category);
+        formData.append('new_price', productDetails.new_price);
+        formData.append('old_price', productDetails.old_price);
 
         try {
-            await fetch('https://aadiltansawala-e-commerce-college-api.onrender.com/upload', {
+            const uploadResponse = await fetch('https://aadiltansawala-e-commerce-college-api.onrender.com/upload', {
                 method: 'POST',
-                headers: {
-                    Accept: 'application/json',
-                },
                 body: formData,
-            }).then((resp) => resp.json()).then((data) => { responseData = data })
+            });
+            const uploadData = await uploadResponse.json();
 
-            if (responseData.success) {
+            if (uploadData.success) {
                 // Update productDetails with the image URL
-                product.image = responseData.imageUrl;
-                console.log(product);
+                const product = { ...productDetails, image: uploadData.imageUrl };
+
                 // Send a POST request to add the product
                 const addProductResponse = await fetch('https://aadiltansawala-e-commerce-college-api.onrender.com/addproduct', {
                     method: 'POST',
                     headers: {
-                        Accept: 'application/json',
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify(product),
                 });
-
-                // Parse the response JSON data for adding the product
                 const addProductData = await addProductResponse.json();
 
                 // Display success or failure message based on response
-                addProductData.success ? alert("Product Added") : alert("Failed");
+                addProductData.success ? alert("Product Added") : alert("Failed to add product.");
             } else {
-                alert("Failed to upload image");
+                alert("Failed to upload image.");
             }
         } catch (error) {
             console.error('Error adding product:', error);
+            alert("An error occurred while adding the product.");
         }
     };
-
-
 
     return (
         <div className="add-product">
@@ -102,7 +98,7 @@ const AddProduct = () => {
                 <input onChange={imageHandler} type="file" name="image" id="file-input" hidden />
             </div>
 
-            <button onClick={() => { Add_Product() }} className="add-product-button">
+            <button onClick={Add_Product} className="add-product-button">
                 ADD
             </button>
         </div>
