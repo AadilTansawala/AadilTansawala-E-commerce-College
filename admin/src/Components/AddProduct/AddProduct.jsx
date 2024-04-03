@@ -27,25 +27,25 @@ const AddProduct = () => {
     
 
     const Add_Product = async () => {
-        if (!image) {
+        if (image) {
             alert("Please select an image.");
             return;
         }
-
+    
         const { name, category, new_price, old_price } = productDetails;
-
+    
         if (!name || !new_price || !old_price) {
             alert("Please fill in all required fields.");
             return;
         }
-
+    
         const formData = new FormData();
         formData.append('name', name);
         formData.append('category', category);
         formData.append('new_price', new_price);
         formData.append('old_price', old_price);
         formData.append('image', image); // Append the image file to the FormData object
-
+    
         console.log(
             productDetails.name,
             productDetails.category,
@@ -54,12 +54,12 @@ const AddProduct = () => {
             image
         );
         try {
-            const response = await fetch('https://aadiltansawala-e-commerce-college-api.onrender.com/addproduct', {
+            const response = await fetch('https://aadiltansawala-e-commerce-college-api.onrender.com/upload', {
                 method: 'POST',
                 body: formData,
             });
             const data = await response.json();
-
+    
             if (data.success) {
                 alert("Product Added");
             } else {
@@ -70,6 +70,7 @@ const AddProduct = () => {
             alert("An error occurred while adding the product.");
         }
     };
+    
     
 
     return (
