@@ -67,6 +67,7 @@ const AddProduct = () => {
             alert("An error occurred while adding the product.");
         }
     };
+
     
 
     return (
