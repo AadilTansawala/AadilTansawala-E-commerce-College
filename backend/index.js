@@ -1,5 +1,6 @@
 const port = 4000;
 const express = require("express");
+const bodyParser = require('body-parser');
 const app = express();
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
@@ -19,6 +20,10 @@ app.use(cors());
 // Add your routes here
 // For example:
 app.options(['/allproducts', '/removeproduct', '/upload', '/addproduct', '/images' ,'/images/:productId'], cors());
+
+// Increase the payload size limit
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
 
 // Database Connection with MongoDB0
