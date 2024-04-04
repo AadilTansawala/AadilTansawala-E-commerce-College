@@ -180,8 +180,20 @@ const productSchema = new mongoose.Schema({
 // Create a model based on the product schema
 const Product = mongoose.model("Product", productSchema);
 
+// Function to read the contents of the uploaded image file and return a promise
+const readImageFile = (filePath) => {
+    return new Promise((resolve, reject) => {
+        fs.readFile(filePath, (err, data) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(data);
+            }
+        });
+    });
+};
 
-//Creating API for adding Products
+
 // Creating API for adding Products
 app.post('/addproduct', upload.single('image'), async (req, res) => {
     try {
@@ -213,7 +225,7 @@ app.post('/addproduct', upload.single('image'), async (req, res) => {
 
         // Read the uploaded image file
         const image = {
-            data: req.file.buffer,
+            data: await readImageFile(req.file.path);,
             contentType: req.file.mimetype
         };
 
@@ -228,7 +240,7 @@ app.post('/addproduct', upload.single('image'), async (req, res) => {
         });
 
         // Save the product to the database
-        // await product.save();
+        await product.save();
 
         res.status(201).json({
             success: true,
