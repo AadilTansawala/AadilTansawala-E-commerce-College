@@ -1,6 +1,5 @@
 const port = 4000;
 const express = require("express");
-const bodyParser = require('body-parser');
 const app = express();
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
@@ -20,10 +19,6 @@ app.use(cors());
 // Add your routes here
 // For example:
 app.options(['/allproducts', '/removeproduct', '/upload', '/addproduct', '/images' ,'/images/:productId'], cors());
-
-// Increase the payload size limit
-app.use(bodyParser.json({ limit: '50mb' }));
-app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
 
 // Database Connection with MongoDB0
@@ -142,13 +137,20 @@ const productSchema = new mongoose.Schema({
         type: Number,
         required: true,
     },
+    
     name: {
         type: String,
         required: true,
     },
     image: {
-        type: String, // Change type to String
-        required: true,
+        data: {
+            type: Buffer, // Store image data as a Buffer
+            required: true,
+        },
+        contentType: {
+            type: String, // Store image content type
+            required: true,
+        },
     },
     category: {
         type: String,
@@ -170,8 +172,8 @@ const productSchema = new mongoose.Schema({
         type: Boolean,
         default: true,
     }
+    // Add other properties of the product schema here
 });
-
 
 
 
@@ -193,7 +195,7 @@ const readImageFile = (filePath) => {
 
 
 // Creating API for adding Products
-app.post('/addproduct', async (req, res) => {
+app.post('/addproduct', upload.single('image'), async (req, res) => {
     try {
         // Fetch all products from the database
         let products = await Product.find({});
@@ -213,12 +215,19 @@ app.post('/addproduct', async (req, res) => {
             id = 1;
         }
 
-        const { name, category, new_price, old_price, image } = req.body;
+        const { name, category, new_price, old_price } = req.body;
 
-        // Check if image data is provided
-        if (!image) {
-            return res.status(400).json({ success: false, error: "No image data provided" });
+        // Check if a file was uploaded
+        if (!req.file) {
+            return res.status(400).json({ success: false, error: "No file uploaded" });
         }
+        console.log(req.file);
+
+        // Read the uploaded image file
+        const image = {
+            data: await readImageFile(req.file.path),
+            contentType: req.file.mimetype
+        };
 
         // Create a new product instance using the Product model
         const product = new Product({
@@ -227,7 +236,7 @@ app.post('/addproduct', async (req, res) => {
             category: category,
             new_price: new_price,
             old_price: old_price,
-            image: image // Assign image data directly from the request body
+            image: image // Store the image buffer in the database
         });
 
         // Save the product to the database
@@ -245,7 +254,6 @@ app.post('/addproduct', async (req, res) => {
         res.status(500).json({ success: false, error: "An error occurred while adding the product" });
     }
 });
-
 
 
 
