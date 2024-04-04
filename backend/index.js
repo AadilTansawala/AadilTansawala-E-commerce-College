@@ -215,19 +215,9 @@ app.post('/addproduct', upload.single('image'), async (req, res) => {
             id = 1;
         }
 
-        const { name, category, new_price, old_price } = req.body;
+        const { name, category, new_price, old_price , image } = req.body;
 
-        // Check if a file was uploaded
-        if (!req.file) {
-            return res.status(400).json({ success: false, error: "No file uploaded" });
-        }
-        console.log(req.file);
-
-        // Read the uploaded image file
-        const image = {
-            data: await readImageFile(req.file.path),
-            contentType: req.file.mimetype
-        };
+        
 
         // Create a new product instance using the Product model
         const product = new Product({
