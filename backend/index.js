@@ -227,7 +227,7 @@ app.post('/addproduct', upload.single('image'), async (req, res) => {
         });
 
         // Save the product to the database
-        await product.save();
+        // await product.save();
 
         res.status(201).json({
             success: true,
