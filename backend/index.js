@@ -225,7 +225,7 @@ app.post('/addproduct', upload.single('image'), async (req, res) => {
 
         // Read the uploaded image file
         const image = {
-            data: await readImageFile(req.file.path);,
+            data: await readImageFile(req.file.path),
             contentType: req.file.mimetype
         };
 
