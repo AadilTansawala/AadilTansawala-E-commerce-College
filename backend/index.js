@@ -137,20 +137,13 @@ const productSchema = new mongoose.Schema({
         type: Number,
         required: true,
     },
-    
     name: {
         type: String,
         required: true,
     },
     image: {
-        data: {
-            type: Buffer, // Store image data as a Buffer
-            required: true,
-        },
-        contentType: {
-            type: String, // Store image content type
-            required: true,
-        },
+        type: String, // Change type to String
+        required: true,
     },
     category: {
         type: String,
@@ -172,8 +165,8 @@ const productSchema = new mongoose.Schema({
         type: Boolean,
         default: true,
     }
-    // Add other properties of the product schema here
 });
+
 
 
 
@@ -195,7 +188,7 @@ const readImageFile = (filePath) => {
 
 
 // Creating API for adding Products
-app.post('/addproduct', upload.single('image'), async (req, res) => {
+app.post('/addproduct', async (req, res) => {
     try {
         // Fetch all products from the database
         let products = await Product.find({});
@@ -215,9 +208,12 @@ app.post('/addproduct', upload.single('image'), async (req, res) => {
             id = 1;
         }
 
-        const { name, category, new_price, old_price , image } = req.body;
+        const { name, category, new_price, old_price, image } = req.body;
 
-        
+        // Check if image data is provided
+        if (!image) {
+            return res.status(400).json({ success: false, error: "No image data provided" });
+        }
 
         // Create a new product instance using the Product model
         const product = new Product({
@@ -226,7 +222,7 @@ app.post('/addproduct', upload.single('image'), async (req, res) => {
             category: category,
             new_price: new_price,
             old_price: old_price,
-            image: image // Store the image buffer in the database
+            image: image // Assign image data directly from the request body
         });
 
         // Save the product to the database
@@ -244,6 +240,7 @@ app.post('/addproduct', upload.single('image'), async (req, res) => {
         res.status(500).json({ success: false, error: "An error occurred while adding the product" });
     }
 });
+
 
 
 

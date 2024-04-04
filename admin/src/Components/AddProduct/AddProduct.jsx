@@ -1,12 +1,11 @@
 import { useState, useEffect } from "react";
-import "./AddProduct.css";
 import upload_area from "../../Assets/upload_area.svg";
 
 const AddProduct = () => {
     const [image, setImage] = useState(null);
     const [productDetails, setProductDetails] = useState({
         name: "",
-        image: "",
+        image: "", // Initialize image property with an empty string
         category: "men",
         new_price: "",
         old_price: ""
@@ -19,17 +18,16 @@ const AddProduct = () => {
             reader.readAsDataURL(selectedFile);
             reader.onload = () => {
                 setImage(reader.result);
+                // Set the base64 encoded image data to the productDetails state
+                setProductDetails({ ...productDetails, image: reader.result });
             };
         }
     };
+    
 
     const changeHandler = (e) => {
         setProductDetails({ ...productDetails, [e.target.name]: e.target.value });
     };
-
-    useEffect(() => {
-        console.log("Updated product details:", productDetails);
-    }, [productDetails]); // Log the updated product details whenever productDetails changes
 
     const Add_Product = async () => {
         try {
@@ -38,12 +36,7 @@ const AddProduct = () => {
                 alert("Please select an image.");
                 return;
             }
-
-            console.log(image);
-
-            // Update productDetails with the image data URL
-            setProductDetails({ ...productDetails, image: image });
-
+    
             // Send a POST request to add the product
             const addProductResponse = await fetch('https://aadiltansawala-e-commerce-college-api.onrender.com/addproduct', {
                 method: 'POST',
@@ -52,19 +45,25 @@ const AddProduct = () => {
                 },
                 body: JSON.stringify(productDetails),
             });
-
+    
             // Parse the response JSON data for adding the product
             const addProductData = await addProductResponse.json();
-
+    
             // Display success or failure message based on response
             addProductData.success ? alert("Product Added") : alert("Failed");
         } catch (error) {
             console.error('Error adding product:', error);
         }
     };
+    
+
+    useEffect(() => {
+        console.log("Updated product details:", productDetails);
+    }, [productDetails]); // Log the updated product details whenever productDetails changes
 
     return (
         <div className="add-product">
+            {/* Input fields for product details */}
             <div className="add-product-itemField">
                 <p>Product Title</p>
                 <input value={productDetails.name} onChange={changeHandler} type="text" name="name" placeholder="Type Here.." />
