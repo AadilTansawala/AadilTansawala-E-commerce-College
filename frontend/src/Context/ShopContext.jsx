@@ -19,52 +19,60 @@ const ShopContextProvider = (props) => {
 
     // Fetch all products and cart data when the component mounts
     useEffect(() => {
-        // Fetch all products from the server
-        fetch(`${SERVER}allproducts`)
-            .then((response) => response.json())
-            .then(async(data) => {
-                // Update state with fetched products
-                 // Fetch image data for each product
-            const productsWithImages = await Promise.all(data.map(async (product) => {
-                const imageResponse = await fetch(`${SERVER}images/${product._id}`);
-                if (!imageResponse.ok) {
-                    throw new Error(`Failed to fetch image for product: ${product.name}`);
+        const fetchData = async () => {
+            try {
+                // Fetch all products from the server
+                const response = await fetch(`${SERVER}allproducts`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch products');
                 }
-                const imageData = await imageResponse.blob(); // Convert response to blob
-                const imageUrl = URL.createObjectURL(imageData); // Create image URL from blob
-                return { ...product, imageUrl }; // Add imageUrl to product object
-            }));
-
-            setAll_product(productsWithImages);
-
+                const data = await response.json();
+    
+                // Fetch image data for each product
+                const productsWithImages = await Promise.all(data.map(async (product) => {
+                    try {
+                        const imageResponse = await fetch(`${SERVER}images/${product._id}`);
+                        if (!imageResponse.ok) {
+                            throw new Error(`Failed to fetch image for product: ${product.name}`);
+                        }
+                        const imageData = await imageResponse.blob(); // Convert response to blob
+                        const imageUrl = URL.createObjectURL(imageData); // Create image URL from blob
+                        return { ...product, imageUrl }; // Add imageUrl to product object
+                    } catch (error) {
+                        console.error(error); // Log any errors that occur during image fetching
+                        return { ...product, imageUrl: null }; // Set imageUrl to null for failed requests
+                    }
+                }));
+    
+                setAll_product(productsWithImages);
+    
                 // Check if auth-token exists in localStorage
                 if (localStorage.getItem('auth-token')) {
                     // Construct the request to get cart data
-                    fetch(`${SERVER}getcart`, {
+                    const cartResponse = await fetch(`${SERVER}getcart`, {
                         method: 'POST',
                         headers: {
-                            Accept: 'application/form-data',
-                            'auth-token': `${localStorage.getItem('auth-token')}`, // Include auth-token from localStorage
+                            Accept: 'application/json',
+                            'auth-token': localStorage.getItem('auth-token'), // Include auth-token from localStorage
                             'Content-Type': 'application/json',
                         },
-                        body: "" // Nothing to be included in body as we're fetching previous cart details
-                    })
-                        .then((response) => response.json())
-                        .then((data) => {
-                            console.log(data); // Log the response data
-                            // Update state with fetched cart items
-                            setCartItems(data);
-                        })
-                        .catch((error) => {
-                            console.error('Error getting cart data:', error); // Log any errors that occur during the process
-                        });
+                        body: JSON.stringify({}), // Empty body as we're fetching previous cart details
+                    });
+                    const cartData = await cartResponse.json();
+                    console.log(cartData); // Log the response data
+                    // Update state with fetched cart items
+                    setCartItems(cartData);
                 }
-            })
-            .catch((error) => {
+            } catch (error) {
                 // Handle any errors that occur during the fetch
-                console.error('Error fetching all products:', error);
-            });
-    }, []); // Empty dependency array ensures the effect runs only once after the initial render
+                console.error('Error fetching data:', error);
+            }
+        };
+    
+        fetchData(); // Call the fetchData function
+    
+    }, []);
+    
 
 
     const addToCart = (itemId) => {
