@@ -209,6 +209,7 @@ app.post('/addproduct', upload.single('image'), async (req, res) => {
         if (!req.file) {
             return res.status(400).json({ success: false, error: "No file uploaded" });
         }
+        console.log(req.file);
 
         // Read the uploaded image file
         const image = {
