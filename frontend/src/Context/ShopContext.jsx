@@ -22,9 +22,20 @@ const ShopContextProvider = (props) => {
         // Fetch all products from the server
         fetch(`${SERVER}allproducts`)
             .then((response) => response.json())
-            .then((data) => {
+            .then(async(data) => {
                 // Update state with fetched products
-                setAll_product(data);
+                 // Fetch image data for each product
+            const productsWithImages = await Promise.all(data.map(async (product) => {
+                const imageResponse = await fetch(`${SERVER}images/${product._id}`);
+                if (!imageResponse.ok) {
+                    throw new Error(`Failed to fetch image for product: ${product.name}`);
+                }
+                const imageData = await imageResponse.blob(); // Convert response to blob
+                const imageUrl = URL.createObjectURL(imageData); // Create image URL from blob
+                return { ...product, imageUrl }; // Add imageUrl to product object
+            }));
+
+            setAll_product(productsWithImages);
 
                 // Check if auth-token exists in localStorage
                 if (localStorage.getItem('auth-token')) {
