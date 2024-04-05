@@ -297,6 +297,39 @@ app.get('/allproducts', async (req, res) => {
 });
 
 
+// API endpoint to fetch product by ID
+app.get('/product/:id', async (req, res) => {
+    try {
+        const product = await Product.findById(req.params.id);
+        res.json(product);
+    } catch (error) {
+        console.error('Error fetching product details:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// API endpoint to update product
+app.put('/updateproduct', upload.single('image'), async (req, res) => {
+    try {
+        const { name, category, new_price, old_price } = req.body;
+        const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;
+        const updatedProduct = {
+            name,
+            category,
+            new_price,
+            old_price,
+            imageUrl
+        };
+        await Product.findByIdAndUpdate(req.body._id, updatedProduct);
+        res.json({ success: true, message: 'Product updated successfully' });
+    } catch (error) {
+        console.error('Error updating product:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+
+
 // Schema Creation for User Model
 
 
