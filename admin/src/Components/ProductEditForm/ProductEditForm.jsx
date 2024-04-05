@@ -8,7 +8,7 @@ const ProductEditForm = ({ product, onClose }) => {
 
   const imageHandler = (e) => {
     setImage(e.target.files[0]);
-    setEditedProduct({ ...editedProduct, [e.target.name]: image });
+    console.log(editedProduct);
   };
 
   const handleChange = (e) => {
@@ -19,6 +19,16 @@ const ProductEditForm = ({ product, onClose }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const formData = new FormData();
+        formData.append('name', editedProduct.name);
+        formData.append('category', editedProduct.category);
+        formData.append('new_price', editedProduct.new_price);
+        formData.append('old_price', editedProduct.old_price);
+        formData.append('available', editedProduct.available);
+        formData.append('image', image);
+        formData.append('_id', image);
+
     try {
       const response = await fetch(
         `https://aadiltansawala-e-commerce-college-api.onrender.com/updateproduct`,
@@ -27,7 +37,7 @@ const ProductEditForm = ({ product, onClose }) => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(editedProduct),
+          body: formData,
         }
       );
       const data = await response.json();

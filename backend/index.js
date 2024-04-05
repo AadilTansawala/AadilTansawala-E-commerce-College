@@ -328,11 +328,11 @@ app.put('/updateproduct', upload.single('image'), async (req, res) => {
             contentType: req.file.mimetype
         };
         const updatedProduct = {
-            name,
-            category,
-            new_price,
-            old_price,
-            image : image_content 
+            name: name,
+            category: category,
+            new_price: new_price,
+            old_price: old_price,
+            image: image_content 
         };
         await Product.findByIdAndUpdate(req.body._id, updatedProduct);
         res.json({ success: true, message: 'Product updated successfully' });
