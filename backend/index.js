@@ -18,8 +18,15 @@ app.use(express.json());
 app.use(cors());
 
 // Increase the request size limit
-app.use(bodyParser.json({ limit: '50mb' }));
-app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
+app.use(bodyParser.urlencoded({
+    limit: '50mb',
+    parameterLimit: 100000,
+    extended: false 
+}));
+
+app.use(bodyParser.json({
+    limit: '50mb'
+}));
 
 // Add your routes here
 // For example:
@@ -316,16 +323,15 @@ app.get('/product/:id', async (req, res) => {
 // API endpoint to update product
 app.put('/updateproduct', upload.single('image'), async (req, res) => {
     try {
-        const { name, category, new_price, old_price } = req.body;
-        const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;
+        const { name, category, new_price, old_price , image} = req.body;
         const updatedProduct = {
             name,
             category,
             new_price,
             old_price,
-            imageUrl
+            image
         };
-        await Product.findByIdAndUpdate(req.body.id, updatedProduct);
+        await Product.findByIdAndUpdate(req.body._id, updatedProduct);
         res.json({ success: true, message: 'Product updated successfully' });
     } catch (error) {
         console.error('Error updating product:', error);
