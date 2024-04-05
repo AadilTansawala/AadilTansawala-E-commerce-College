@@ -322,11 +322,21 @@ app.get('/product/:id', async (req, res) => {
 // API endpoint to update product
 app.put('/updateproduct', upload.single('image'), async (req, res) => {
     try {
-        const { name, category, new_price, old_price , image} = req.body;
-        const image_content = image.data?image:image = {
-            data: await readImageFile(req.file.path),
-            contentType: req.file.mimetype
-        };
+        const { name, category, new_price, old_price } = req.body;
+        let image_content;
+
+        // Check if an image was included in the request
+        if (req.file) {
+            // If an image was included, read the image file and create image_content
+            image_content = {
+                data: await readImageFile(req.file.path),
+                contentType: req.file.mimetype
+            };
+        } else {
+            // If no image was included, use the existing image content from the database
+            image_content = req.body.image;
+        }
+
         const updatedProduct = {
             name: name,
             category: category,
@@ -334,13 +344,19 @@ app.put('/updateproduct', upload.single('image'), async (req, res) => {
             old_price: old_price,
             image: image_content 
         };
+
+        // Update the product in the database using findByIdAndUpdate
         await Product.findByIdAndUpdate(req.body._id, updatedProduct);
+
+        // Send a success response
         res.json({ success: true, message: 'Product updated successfully' });
     } catch (error) {
+        // Handle errors and send an error response
         console.error('Error updating product:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
+
 
 
 
