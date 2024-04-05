@@ -13,26 +13,20 @@ const ProductEditForm = ({ product, onClose }) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setEditedProduct({ ...editedProduct, [name]: value });
+    console.log(product);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const formData = new FormData();
-      formData.append("id", editedProduct.id);
-      formData.append("name", editedProduct.name);
-      formData.append("category", editedProduct.category);
-      formData.append("new_price", editedProduct.new_price);
-      formData.append("old_price", editedProduct.old_price);
-      if (image) {
-        formData.append("image", image);
-      }
-
       const response = await fetch(
-        "https://aadiltansawala-e-commerce-college-api.onrender.com/updateproduct",
+        `https://aadiltansawala-e-commerce-college-api.onrender.com/updateproduct`,
         {
           method: "PUT",
-          body: formData,
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(editedProduct),
         }
       );
       const data = await response.json();

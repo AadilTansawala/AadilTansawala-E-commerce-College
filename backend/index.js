@@ -1,5 +1,6 @@
 const port = 4000;
 const express = require("express");
+const bodyParser = require('body-parser');
 const app = express();
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
@@ -15,6 +16,10 @@ app.use(express.json());
 
 // Enable CORS for all routes
 app.use(cors());
+
+// Increase the request size limit
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
 // Add your routes here
 // For example:
