@@ -102,7 +102,7 @@ const ShopContextProvider = (props) => {
     }
 
     const removeFromCart = (itemId) => {
-        setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] - 1 }))
+        setCartItems((prev) => ({ ...prev, [itemId]: 0 }))
 
          // Check if auth-token exists in localStorage
          if (localStorage.getItem('auth-token')) {
@@ -127,6 +127,33 @@ const ShopContextProvider = (props) => {
 
     }
 
+    const updateCart = (itemId, quantity) => {
+        // Update the quantity of the specified item in the cart locally
+        setCartItems(prev => ({ ...prev, [itemId]: quantity }));
+    
+        // Check if auth-token exists in localStorage
+        if (localStorage.getItem('auth-token')) {
+            // Construct the request to update item quantity in cart
+            fetch(`${SERVER}updatecart`, {
+                method: 'POST',
+                headers: {
+                    Accept: 'application/json',
+                    'auth-token': localStorage.getItem('auth-token'), // Include auth-token from localStorage
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ itemId: itemId, quantity: quantity }), // Include the item ID and quantity in the request body
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data); // Log the response data
+                })
+                .catch(error => {
+                    console.error('Error updating item quantity in cart:', error); // Log any errors that occur during the process
+                });
+        }
+    }
+    
+
     const getTotalCartAmount = () => {
         let totalAmount = 0;
 
@@ -143,17 +170,24 @@ const ShopContextProvider = (props) => {
 
     const getTotalCartItems = () => {
         let totalItems = 0;
-
+    
+        // Loop through each item in the cartItems object
         for (const item in cartItems) {
-            if (cartItems[item] > 0) {
-                totalItems += cartItems[item];
+            // Convert the quantity of the item to an integer
+            const quantity = parseInt(cartItems[item]);
+    
+            // Check if the quantity of the item is greater than 0
+            if (!isNaN(quantity) && quantity > 0) {
+                // Increment the totalItems by the quantity of the current item
+                totalItems += quantity;
             }
         }
-
+    
         return totalItems;
     }
+    
 
-    const contextValue = {all_product, cartItems, addToCart, removeFromCart, getTotalCartAmount, getTotalCartItems };
+    const contextValue = {all_product, cartItems, addToCart, removeFromCart, updateCart , getTotalCartAmount, getTotalCartItems };
     return (
         <ShopContext.Provider value={contextValue}>
             {props.children}

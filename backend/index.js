@@ -523,10 +523,8 @@ app.post('/removefromcart', fetchUser, async (req, res) => {
         // Find the user data based on the user ID extracted from the JWT token
         let userData = await Users.findOne({ _id: req.user.id });
 
-        // Decrement the quantity of the specified item in the user's cart data
-        if (userData.cartData[req.body.itemId] > 0) {
-            userData.cartData[req.body.itemId] -= 1;
-        }
+        // Set the quantity of the specified item in the user's cart data to 0
+        userData.cartData[req.body.itemId] = 0;
 
         // Update the user's cart data in the database
         await Users.findOneAndUpdate({ _id: req.user.id }, { cartData: userData.cartData });
@@ -539,6 +537,36 @@ app.post('/removefromcart', fetchUser, async (req, res) => {
         res.status(500).json({ success: false, errors: "Internal server error" });
     }
 });
+
+
+// Creating endpoint to update products from cart data
+app.post('/updatecart', fetchUser, async (req, res) => {
+    try {
+        // Extract item ID and quantity from request body
+        const { itemId, quantity } = req.body;
+
+        // Find the user data based on the user ID extracted from the JWT token
+        let userData = await Users.findOne({ _id: req.user.id });
+
+        // Convert quantity to a number
+        const parsedQuantity = parseInt(quantity);
+
+        // Update the quantity of the specified item in the user's cart data
+        userData.cartData[itemId] = isNaN(parsedQuantity) || parsedQuantity <= 0 ? 0 : parsedQuantity;
+
+        // Update the user's cart data in the database
+        await Users.findOneAndUpdate({ _id: req.user.id }, { cartData: userData.cartData });
+
+        // Send success response
+        res.send("Cart updated successfully");
+    } catch (error) {
+        // If an error occurs during the process, respond with an error message
+        console.error("Error updating cart:", error);
+        res.status(500).json({ success: false, errors: "Internal server error" });
+    }
+});
+
+
 
 // Creating endpoint to get cart data
 app.post('/getcart', fetchUser, async (req, res) => {
