@@ -31,7 +31,7 @@ const ProductEditForm = ({ product, onClose }) => {
       const response = await fetch(
         "https://aadiltansawala-e-commerce-college-api.onrender.com/updateproduct",
         {
-          method: "POST",
+          method: "PUT",
           body: formData,
         }
       );
