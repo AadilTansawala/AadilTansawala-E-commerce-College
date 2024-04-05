@@ -333,8 +333,14 @@ app.put('/updateproduct', upload.single('image'), async (req, res) => {
                 contentType: req.file.mimetype
             };
         } else {
-            // If no image was included, use the existing image content from the database
-            image_content = req.body.image;
+            // If no image was included, check if the existing image URL is provided in the request body
+            if (req.body.image) {
+                // Use the existing image content from the database
+                image_content = req.body.image;
+            } else {
+                // If no image URL is provided, set image_content to null or an appropriate default value
+                image_content = null; // or some default image content
+            }
         }
 
         const updatedProduct = {
@@ -356,6 +362,7 @@ app.put('/updateproduct', upload.single('image'), async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 });
+
 
 
 

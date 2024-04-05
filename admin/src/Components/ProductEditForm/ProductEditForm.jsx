@@ -19,24 +19,28 @@ const ProductEditForm = ({ product, onClose }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     const formData = new FormData();
-        formData.append('name', editedProduct.name);
-        formData.append('category', editedProduct.category);
-        formData.append('new_price', editedProduct.new_price);
-        formData.append('old_price', editedProduct.old_price);
-        formData.append('available', editedProduct.available);
-        formData.append('image', image);
-        formData.append('_id', image);
-
+    formData.append('name', editedProduct.name);
+    formData.append('category', editedProduct.category);
+    formData.append('new_price', editedProduct.new_price);
+    formData.append('old_price', editedProduct.old_price);
+    formData.append('available', editedProduct.available);
+    
+    if (image) {
+      formData.append('image', image);
+    } else if (editedProduct.image) {
+      // If no new image selected but product has an existing image, use the existing image URL
+      formData.append('image', editedProduct.image);
+    }
+    
+    formData.append('_id', editedProduct._id); // Assuming _id is the product ID
+  
     try {
       const response = await fetch(
         `https://aadiltansawala-e-commerce-college-api.onrender.com/updateproduct`,
         {
           method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
           body: formData,
         }
       );
@@ -48,6 +52,7 @@ const ProductEditForm = ({ product, onClose }) => {
       // Handle error here (e.g., show error message)
     }
   };
+  
 
   return (
     <div className="add-product">
