@@ -7,6 +7,7 @@ const ListProduct = () => {
   const SERVER = "https://aadiltansawala-e-commerce-college-api.onrender.com/";
   const [allproducts, setAllProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
 
   const fetchInfo = async () => {
     try {
@@ -61,60 +62,70 @@ const ListProduct = () => {
   // Function to handle selecting a product for editing
   const handleEditProduct = (product) => {
     setSelectedProduct(product);
+    setIsEditing(true); // Set isEditing to true when a product is selected for editing
+  };
+
+  // Function to handle closing the product edit form
+  const handleCloseEditForm = () => {
+    setSelectedProduct(null);
+    setIsEditing(false); // Set isEditing to false when the edit form is closed
   };
 
   return (
     <div className="list-product">
-      <h1>All Products List</h1>
-      <div className="list-product-format-main">
-        <p>Products</p>
-        <p>Title</p>
-        <p>Old Price</p>
-        <p>NewPrice</p>
-        <p>Category</p>
-        <p>Remove</p>
-      </div>
-
-      <div className="list-product-all-products">
-        <hr />
-        {allproducts.map((product, index) => {
-          return (
-            <>
-              <div
-                key={index}
-                className="list-product-format-main list-product-format"
-                onClick={() => handleEditProduct(product)} // Call handleEditProduct when product is clicked
-              >
-                <img
-                  className="list-product-product-icon"
-                  src={product.imageUrl}
-                  alt={product.name}
-                />
-
-                <p>{product.name}</p>
-                <p>${product.old_price}</p>
-                <p>${product.new_price}</p>
-                <p>{product.category}</p>
-                <img
-                  onClick={() => {
-                    remove_product(product.id);
-                  }}
-                  src={cross_Icon}
-                  alt=""
-                  className="list-product-remove-icon"
-                />
-              </div>
-              <hr />
-            </>
-          );
-        })}
-      </div>
-      {/* Render ProductEditForm when a product is selected for editing */}
-      {selectedProduct && (
+      {/* Conditionally render product list or edit form based on isEditing state */}
+      {isEditing ? (
         <ProductEditForm
           product={selectedProduct}
-          onClose={() => setSelectedProduct(null)} // Close the form when onClose is called
+          onClose={handleCloseEditForm} // Pass handleCloseEditForm as onClose prop
         />
+      ) : (
+        <>
+          <h1>All Products List</h1>
+          <div className="list-product-format-main">
+            <p>Products</p>
+            <p>Title</p>
+            <p>Old Price</p>
+            <p>NewPrice</p>
+            <p>Category</p>
+            <p>Remove</p>
+          </div>
+
+          <div className="list-product-all-products">
+            <hr />
+            {allproducts.map((product, index) => {
+              return (
+                <>
+                  <div
+                    key={index}
+                    className="list-product-format-main list-product-format"
+                    onClick={() => handleEditProduct(product)} // Call handleEditProduct when product is clicked
+                  >
+                    <img
+                      className="list-product-product-icon"
+                      src={product.imageUrl}
+                      alt={product.name}
+                    />
+
+                    <p>{product.name}</p>
+                    <p>${product.old_price}</p>
+                    <p>${product.new_price}</p>
+                    <p>{product.category}</p>
+                    <img
+                      onClick={() => {
+                        remove_product(product.id);
+                      }}
+                      src={cross_Icon}
+                      alt=""
+                      className="list-product-remove-icon"
+                    />
+                  </div>
+                  <hr />
+                </>
+              );
+            })}
+          </div>
+        </>
       )}
     </div>
   );
