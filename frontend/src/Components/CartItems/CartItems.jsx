@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import './CartItems.css';
 import { ShopContext } from '../../Context/ShopContext';
-import CartItem from '../CartItem/CartItem'; // Import the CartItem component
+import CartItem from '../CartItem/CartItem';// Import the CartItem component
 import remove_icon from '../Assets/cart_cross_icon.png';
 
 const CartItems = () => {
