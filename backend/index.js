@@ -10,13 +10,6 @@ const cors = require("cors");
 const os = require('os');
 const fs = require('fs');
 
-
-
-app.use(express.json());
-
-// Enable CORS for all routes
-app.use(cors());
-
 // Increase the request size limit
 app.use(bodyParser.urlencoded({
     limit: '50mb',
@@ -27,6 +20,12 @@ app.use(bodyParser.urlencoded({
 app.use(bodyParser.json({
     limit: '50mb'
 }));
+
+
+
+// Enable CORS for all routes
+app.use(cors());
+
 
 // Add your routes here
 // For example:
