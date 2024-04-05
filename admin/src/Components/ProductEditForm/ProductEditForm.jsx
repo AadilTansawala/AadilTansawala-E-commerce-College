@@ -8,12 +8,13 @@ const ProductEditForm = ({ product, onClose }) => {
 
   const imageHandler = (e) => {
     setImage(e.target.files[0]);
+    setEditedProduct({ ...editedProduct, [e.target.name]: image });
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setEditedProduct({ ...editedProduct, [name]: value });
-    console.log(product);
+    console.log(editedProduct);
   };
 
   const handleSubmit = async (e) => {
