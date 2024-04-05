@@ -332,8 +332,7 @@ app.put('/updateproduct', upload.single('image'), async (req, res) => {
             category,
             new_price,
             old_price,
-            image : image_content ,
-            _id
+            image : image_content 
         };
         await Product.findByIdAndUpdate(req.body._id, updatedProduct);
         res.json({ success: true, message: 'Product updated successfully' });
