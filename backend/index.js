@@ -10,7 +10,7 @@ const stripe = require('stripe')('sk_test_51P3AuhSITsOuMQMHIaqB58dsUbefe4ncOIslh
 const cors = require("cors");
 const os = require('os');
 const fs = require('fs');
-const fetch = require('node-fetch');
+import fetch from 'node-fetch';
 
 // Update the base URL of your API
 const BASE_URL = 'https://aadiltansawala-e-commerce-college-api.onrender.com/';
