@@ -33,6 +33,7 @@ const CartItems = () => {
                     const product = all_product.find(product => parseInt(product.id) === parseInt(productId)); // Convert both ids to integers
                     if (product) {
                         return {
+                            _id: product._id,
                             id: productId,
                             quantity:parseInt(quantity),
                             name: product.name,
