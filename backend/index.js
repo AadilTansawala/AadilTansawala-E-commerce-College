@@ -669,7 +669,7 @@ app.post('/create-payment-intent', async (req, res) => {
         payment_method_types: ['card'],
         line_items: cartItems.map(item => ({
             price_data: {
-                currency: 'usd',
+                currency: 'inr',
                 product_data: {
                     name: item.name, // Use product name from fetched details
                 },

@@ -28,23 +28,31 @@ const CartItems = () => {
     
         // Fetch product details for each item in the cart
         const getProductDetailsForCart = async () => {
-            const productDetails = await Promise.all(Object.entries(filteredCartItems).map(async ([productId, quantity]) => {
-                const product = all_product.find(product => product.id === productId);
-                if (product) {
-                    return {
-                        id: productId,
-                        quantity,
-                        name: product.name,
-                        imageUrl: product.imageUrl,
-                        new_price: product.new_price,
-                    };
-                }
-                return null;
-            }));
-            return productDetails.filter(product => product !== null);
+            try {
+                const productDetails = await Promise.all(Object.entries(filteredCartItems).map(async ([productId, quantity]) => {
+                    const product = all_product.find(product => parseInt(product.id) === parseInt(productId)); // Convert both ids to integers
+                    if (product) {
+                        return {
+                            id: productId,
+                            quantity:parseInt(quantity),
+                            name: product.name,
+                            imageUrl: product.imageUrl,
+                            new_price: product.new_price,
+                        };
+                    }
+                    return null;
+                }));
+                console.log('Product details fetched successfully:', productDetails);
+                return productDetails.filter(product => product !== null);
+            } catch (error) {
+                console.error('Error fetching product details:', error);
+                return []; // Return an empty array in case of error
+            }
         };
+        
     
         const cartItemsWithProductDetails = await getProductDetailsForCart();
+        console.log(cartItemsWithProductDetails);
     
         // Fetch the client secret from the server
         const response = await fetch(`${SERVER}create-payment-intent`, {
