@@ -33,6 +33,7 @@ const ListProduct = () => {
       );
 
       setAllProducts(productsWithImages);
+      console.log(allproducts);
     } catch (error) {
       console.error("Error fetching products:", error);
       // Handle the error (e.g., show a message to the user)
@@ -69,6 +70,7 @@ const ListProduct = () => {
   const handleCloseEditForm = () => {
     setSelectedProduct(null);
     setIsEditing(false); // Set isEditing to false when the edit form is closed
+    fetchInfo();
   };
 
   return (

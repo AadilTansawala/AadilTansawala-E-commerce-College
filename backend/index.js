@@ -6,6 +6,7 @@ const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const multer = require("multer");
 const path = require("path");
+const stripe = require('stripe')('sk_test_51P3AuhSITsOuMQMHIaqB58dsUbefe4ncOIslhqDfx3wY6i2YtohyV0wLFsB38EAPSoIOaFgj8mDx1nCAPFnqmKXa00PcFf8Bph');
 const cors = require("cors");
 const os = require('os');
 const fs = require('fs');
@@ -653,6 +654,29 @@ app.post('/getcart', fetchUser, async (req, res) => {
         // If an error occurs during the process, respond with an error message
         console.error("Error getting cart data:", error);
         res.status(500).json({ success: false, errors: "Internal server error" });
+    }
+});
+
+app.post('/create-payment-intent', async (req, res) => {
+    const { cartItems, totalAmount } = req.body;
+
+    try {
+        // Calculate the total amount in cents
+        const amount = totalAmount * 100;
+
+        // Create a payment intent with the calculated amount
+        const paymentIntent = await stripe.paymentIntents.create({
+            amount: amount,
+            currency: 'usd',
+            metadata: { cartItems: JSON.stringify(cartItems) }, // Pass cart items as metadata
+        });
+
+        // Send the client secret back to the client along with success status
+        res.send({ clientSecret: paymentIntent.client_secret, status: 'success' });
+    } catch (error) {
+        console.error('Error creating payment intent:', error);
+        // Send error status to client
+        res.status(500).json({ error: 'Internal server error', status: 'failure' });
     }
 });
 
