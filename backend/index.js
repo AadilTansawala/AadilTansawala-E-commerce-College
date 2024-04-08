@@ -686,7 +686,7 @@ app.post('/create-payment-intent', async (req, res) => {
                 // Construct the product data object
                 const productData = {
                     name: item.name,
-                    images: [imageUrl], // Pass image URL as an array
+                    images: [imageResponse], // Pass image URL as an array
                 };
     
                 return {
