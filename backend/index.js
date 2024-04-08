@@ -672,6 +672,7 @@ app.post('/create-payment-intent', async (req, res) => {
                 currency: 'inr',
                 product_data: {
                     name: item.name, // Use product name from fetched details
+                    images: [item.imageUrl], // Pass imageUrl as an array of images
                 },
                 unit_amount: item.new_price * 100, // Use product price from fetched details
             },
