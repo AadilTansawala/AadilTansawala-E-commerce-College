@@ -44,13 +44,14 @@ const Popular = () => {
                 console.error('Error fetching data:', error);
             }
         
-    
-        fetchData(); // Call the fetchData function
-    
-    };
+        };
 
-    fetchData(); // Call the fetchData function
-}, []); // Empty dependency array ensures the effect runs only once after the initial render
+        fetchData(); // Call the fetchData function
+
+        // Make sure to clean up any ongoing tasks if the component unmounts
+        return () => {};
+    }, []); // Empty dependency array ensures the effect runs only once after the initial render
+
 
     return (
         <div className='popular'>

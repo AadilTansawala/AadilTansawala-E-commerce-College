@@ -664,20 +664,30 @@ app.post('/create-payment-intent', async (req, res) => {
         // Calculate the total amount in cents
         const amount = totalAmount * 100;
 
-        // Create a payment intent with the calculated amount
-        const paymentIntent = await stripe.paymentIntents.create({
-            amount: amount,
-            currency: 'usd',
-            metadata: { cartItems: JSON.stringify(cartItems) }, // Pass cart items as metadata
-        });
+       // Create a Stripe Checkout session
+       const session = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        line_items: cartItems.map(item => ({
+            price_data: {
+                currency: 'usd',
+                product_data: {
+                    name: item.name, // Use product name from fetched details
+                },
+                unit_amount: item.new_price * 100, // Use product price from fetched details
+            },
+            quantity: item.quantity,
+        })),
+        mode: 'payment',
+        success_url: 'https://aadil-tansawala-e-commerce-college-frontend.vercel.app/',
+        cancel_url: 'https://aadil-tansawala-e-commerce-college-frontend.vercel.app/mens',
+    });
 
-        // Send the client secret back to the client along with success status
-        res.send({ clientSecret: paymentIntent.client_secret, status: 'success' });
-    } catch (error) {
-        console.error('Error creating payment intent:', error);
-        // Send error status to client
-        res.status(500).json({ error: 'Internal server error', status: 'failure' });
-    }
+    // Send the session ID back to the client
+    res.json({ sessionId: session.id });
+} catch (error) {
+    console.error('Error creating Stripe Checkout session:', error);
+    res.status(500).json({ error: 'Internal server error' });
+}
 });
 
 // Route handler for the root path

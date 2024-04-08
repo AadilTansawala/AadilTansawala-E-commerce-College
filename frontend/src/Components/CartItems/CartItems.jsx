@@ -1,12 +1,87 @@
-import React, { useContext } from 'react';
+import React, { useState , useContext } from 'react';
 import './CartItems.css';
 import { ShopContext } from '../../Context/ShopContext';
 import CartItem from '../CartItem/CartItem';// Import the CartItem component
 import remove_icon from '../Assets/cart_cross_icon.png';
+import { loadStripe } from '@stripe/stripe-js';
+const SERVER = "https://aadiltansawala-e-commerce-college-api.onrender.com/";
+
+const stripePromise = loadStripe('pk_test_51P3AuhSITsOuMQMHEsHrtfJZdOqluOLsDsKfOiQ7wBtXrLayeuAZ3Bu8Wu03UwP3CvJfPCWvLYNW9BryMfbshrRX00TqbSwGot');
+
 
 const CartItems = () => {
     const { all_product, cartItems, removeFromCart, updateCart, getTotalCartAmount } = useContext(ShopContext);
+    const [paymentStatus, setPaymentStatus] = useState(null);
 
+    const handlePayment = async () => {
+        const stripe = await stripePromise;
+    
+        // Filter cart items to include only those with quantity > 0
+        const filteredCartItems = Object.entries(cartItems).reduce((acc, [key, value]) => {
+            if (value > 0) {
+                acc[key] = value;
+            }
+            return acc;
+        }, {});
+    
+        console.log(filteredCartItems, getTotalCartAmount());
+    
+        // Fetch product details for each item in the cart
+        const getProductDetailsForCart = async () => {
+            const productDetails = await Promise.all(Object.entries(filteredCartItems).map(async ([productId, quantity]) => {
+                const product = all_product.find(product => product.id === productId);
+                if (product) {
+                    return {
+                        id: productId,
+                        quantity,
+                        name: product.name,
+                        imageUrl: product.imageUrl,
+                        new_price: product.new_price,
+                    };
+                }
+                return null;
+            }));
+            return productDetails.filter(product => product !== null);
+        };
+    
+        const cartItemsWithProductDetails = await getProductDetailsForCart();
+    
+        // Fetch the client secret from the server
+        const response = await fetch(`${SERVER}create-payment-intent`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ cartItems: cartItemsWithProductDetails, totalAmount: getTotalCartAmount() }),
+        });
+        try {
+            // Send the session ID back to the client
+            const { sessionId, error } = await response.json();
+        
+            // If an error is returned from the server, handle it
+            if (error) {
+                console.error('Error creating payment intent:', error);
+                // Handle the error here (e.g., display an error message to the user)
+            } else {
+                // Redirect to Stripe checkout page
+                const { error } = await stripe.redirectToCheckout({
+                    sessionId: sessionId,
+                });
+        
+                if (error) {
+                    console.error('Error redirecting to checkout:', error);
+                    // Handle the error here (e.g., display an error message to the user)
+                } else {
+                    setPaymentStatus('processing'); // Set payment status to processing while waiting for payment result
+                }
+            }
+        } catch (error) {
+            console.error('Error parsing response:', error);
+            // Handle parsing error here (e.g., display an error message to the user)
+        }
+    }
+        
+    
     return (
         <div className='cart-Items'>
             <div className="CartItems-format-main">
@@ -56,13 +131,13 @@ const CartItems = () => {
                             <h3>${getTotalCartAmount()}</h3>
                         </div>
                     </div>
-                    <button>PROCEED TO CHECKOUT</button>
+                    <button onClick={handlePayment}>PROCEED TO CHECKOUT</button>
                 </div>
                 <div className="CartItems-promoCode">
                     <p>If you have a promo code, enter it here</p>
                     <div className="CartItems-promobox">
                         <input type="text" placeholder='Promo Code' />
-                        <button>Submit</button>
+                        <button onClick={handlePayment}>Proceed to Payment</button>
                     </div>
                 </div>
             </div>
