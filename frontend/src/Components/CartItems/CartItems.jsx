@@ -36,7 +36,7 @@ const CartItems = () => {
                             id: productId,
                             quantity:parseInt(quantity),
                             name: product.name,
-                            imageUrl: product.replace(/^blob:/, ''),
+                            imageUrl: product.imageURl.replace(/^blob:/, ''),
                             new_price: product.new_price,
                         };
                     }
