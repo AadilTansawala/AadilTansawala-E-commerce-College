@@ -10,6 +10,10 @@ const stripe = require('stripe')('sk_test_51P3AuhSITsOuMQMHIaqB58dsUbefe4ncOIslh
 const cors = require("cors");
 const os = require('os');
 const fs = require('fs');
+const fetch = require('node-fetch');
+
+// Update the base URL of your API
+const BASE_URL = 'https://aadiltansawala-e-commerce-college-api.onrender.com/';
 
 // Increase the request size limit
 app.use(bodyParser.urlencoded({
@@ -667,22 +671,53 @@ app.post('/create-payment-intent', async (req, res) => {
        // Create a Stripe Checkout session
        const session = await stripe.checkout.sessions.create({
         payment_method_types: ['card'],
-        line_items: cartItems.map(item => ({
-            price_data: {
-                currency: 'inr',
-                product_data: {
-                    name: item.name, // Use product name from fetched details
-                    images: https://aadiltansawala-e-commerce-college-api.onrender.com/images/:item._id,
-                     // Pass imageUrl as an array of images
-                },
-                unit_amount: item.new_price * 100, // Use product price from fetched details
-            },
-            quantity: item.quantity,
+        line_items: await Promise.all(cartItems.map(async item => {
+            try {
+                // Fetch the image for the current product
+                const imageResponse = await fetch(`${BASE_URL}images/${item._id}`);
+                
+                // Check if the request was successful
+                if (!imageResponse.ok) {
+                    throw new Error(`Failed to fetch image for product: ${item.name}`);
+                }
+    
+                // Get the image URL
+                const imageUrl = await imageResponse.text();
+    
+                // Construct the product data object
+                const productData = {
+                    name: item.name,
+                    images: [imageUrl], // Pass image URL as an array
+                };
+    
+                return {
+                    price_data: {
+                        currency: 'inr',
+                        product_data: productData,
+                        unit_amount: item.new_price * 100,
+                    },
+                    quantity: item.quantity,
+                };
+            } catch (error) {
+                console.error(error);
+                // If image fetch fails, create line item without image
+                return {
+                    price_data: {
+                        currency: 'inr',
+                        product_data: {
+                            name: item.name,
+                        },
+                        unit_amount: item.new_price * 100,
+                    },
+                    quantity: item.quantity,
+                };
+            }
         })),
         mode: 'payment',
         success_url: 'https://aadil-tansawala-e-commerce-college-frontend.vercel.app/',
         cancel_url: 'https://aadil-tansawala-e-commerce-college-frontend.vercel.app/mens',
     });
+    
 
     // Send the session ID back to the client
     res.json({ sessionId: session.id });
